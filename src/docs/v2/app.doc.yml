@@ -1,0 +1,330 @@
+openapi: 3.0.3
+info:
+  title: App API(fragment)
+  version: "1.0.0"
+tags:
+  - name: Apps
+    description: Operations related to apps
+paths:
+  /apps:
+    post:
+      tags:
+        - Apps
+      summary: Create a new app
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    get:
+      tags:
+        - Apps
+      summary: Get all apps
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: App name
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+          description: sort by query in the form of field:desc/asc (ex. name:asc)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Maximum number of apps
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/App"
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 10
+                  totalPages:
+                    type: integer
+                    example: 1
+                  totalResults:
+                    type: integer
+                    example: 1
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /apps/{id}:
+    get:
+      tags:
+        - Apps
+      summary: Get a app
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: App id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags:
+        - Apps
+      summary: Update a app
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: App id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Apps
+      summary: Delete a app
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: App id
+      responses:
+        "200":
+          description: No content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  schemas:
+    AppInput:
+      type: object
+      required:
+        - name
+        - address
+        - phoneNumber
+        - whatsAppNumber
+        - email
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: string
+        whatsAppNumber:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: object
+          properties:
+            portal:
+              type: string
+              enum: [online, offline, waitlist]
+              default: online
+        description:
+          type: string
+        reviews:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              rating:
+                type: number
+              comment:
+                type: string
+        ratings:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+        branding:
+          type: object
+          properties:
+            logo:
+              type: string
+            logoLight:
+              type: string
+            logomark:
+              type: string
+            logomarkLight:
+              type: string
+      example:
+        name: PharmaHub App
+        address: 123 Main St
+        phoneNumber: "+1234567890"
+        whatsAppNumber: "+1234567890"
+        email: contact@pharmahub.com
+        status:
+          portal: online
+        description: A pharmaceutical application
+
+    App:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: string
+        whatsAppNumber:
+          type: string
+        email:
+          type: string
+        status:
+          type: object
+          properties:
+            portal:
+              type: string
+              enum: [online, offline, waitlist]
+        slug:
+          type: string
+        description:
+          type: string
+        reviews:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              rating:
+                type: number
+              comment:
+                type: string
+        ratings:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+        branding:
+          type: object
+          properties:
+            logo:
+              type: string
+            logoLight:
+              type: string
+            logomark:
+              type: string
+            logomarkLight:
+              type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
