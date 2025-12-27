@@ -9,6 +9,7 @@ import ExpressMongoSanitize from "express-mongo-sanitize";
 import compression from "compression";
 import cors from "cors";
 import helmet from "helmet";
+import { errorConverter, errorHandler } from "@/middlewares/error.js";
 
 const app: Application = express();
 
@@ -33,5 +34,11 @@ app.options("*", cors());
 
 /* Routes */
 app.use("/v2", routes);
+
+//  Convert any thrown errors to ApiError
+app.use(errorConverter);
+
+//  Send the formatted error response
+app.use(errorHandler);
 
 export default app;

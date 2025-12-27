@@ -35,6 +35,4 @@ apis: [  path.resolve("src/routes/**/*.ts"),
 
 };
 
-const swaggerDef=swaggerJsdoc(options);
-
-export default swaggerDef;
+export const createSwaggerSpec=()=>swaggerJsdoc(options);

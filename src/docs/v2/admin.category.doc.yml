@@ -3,13 +3,13 @@ info:
   title: Users API (fragment)
   version: "1.0.0"
 tags:
-  - name: Admin / Category
+  - name: Admin Category
     description: Operations related to categories from using the admin access
 paths:
   /admin/categories:
     post:
       tags:
-        - Admin / Category
+        - Admin Category
       summary: Create a new category
       security:
         - bearerAuth: []
@@ -43,14 +43,11 @@ paths:
 
     get:
       tags:
-        - Admin / Category
+        - Admin Category
       summary: Retrieve all categories
       security:
         - bearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/search"
+
       responses:
         "200":
           description: List of categories retrieved successfully
@@ -64,7 +61,7 @@ paths:
   /admin/categories/{id}:
     get:
       tags:
-        - Admin / Category
+        - Admin Category
       summary: Get category by ID
       security:
         - bearerAuth: []
@@ -86,7 +83,7 @@ paths:
 
     patch:
       tags:
-        - Admin / Category
+        - Admin Category
       summary: Update a category
       security:
         - bearerAuth: []
@@ -98,9 +95,18 @@ paths:
             type: string
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: "#/components/schemas/UpdateCategoryDto"
+              type: object
+              required:
+                - data
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Updated category image
+                data:
+                  $ref: "#/components/schemas/UpdateCategoryDto"
       responses:
         "200":
           description: Category updated successfully
@@ -111,7 +117,7 @@ paths:
 
     delete:
       tags:
-        - Admin / Category
+        - Admin Category
       summary: Delete a category
       security:
         - bearerAuth: []
@@ -186,8 +192,6 @@ components:
             properties:
               name:
                 type: string
-              slug:
-                type: string
               _id:
                 type: string
         createdAt:
@@ -216,12 +220,10 @@ components:
             type: object
             required:
               - name
-              - slug
             properties:
               name:
                 type: string
-              slug:
-                type: string
+
     UpdateCategoryDto:
       type: object
       properties:
@@ -238,18 +240,3 @@ components:
             properties:
               name:
                 type: string
-              slug:
-                type: string
-    PaginationMeta:
-      type: object
-      properties:
-        totalItems:
-          type: integer
-        itemCount:
-          type: integer
-        itemsPerPage:
-          type: integer
-        totalPages:
-          type: integer
-        currentPage:
-          type: integer

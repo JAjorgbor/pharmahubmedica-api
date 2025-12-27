@@ -1,12 +1,22 @@
 import config from "@/config/config.js";
+import ApiError from "@/utils/api-error.js";
 import r2 from "@/utils/r2-client.js";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import Busboy from "busboy";
 import type { Request } from "express";
+import type { ZodType } from "zod";
+import httpStatus from "http-status";
+import { validateService } from "@/middlewares/validate.js";
 
 type AssetUploadResult = {
   image: { url: string; key: string };
   fields: any;
+};
+
+type UploadValidation = {
+  fields?: ZodType; // validates parsed fields
+  file?: ZodType; // validates file metadata
+  requireFile?: boolean;
 };
 
 async function uploadToR2({
@@ -33,16 +43,22 @@ async function uploadToR2({
     url: `${config.r2.publicUrl}/${key}`,
   };
 }
+
 export function handleAssetUpload(
   req: Request,
-  key: string
+  key: string,
+  validation?: UploadValidation
 ): Promise<AssetUploadResult> {
   return new Promise((resolve, reject) => {
     const busboy = Busboy({ headers: req.headers });
+
     const fields: Record<string, any> = {};
     let fileSeen = false;
+
     let fileBuffer: Buffer[] = [];
     let fileMime: string | undefined;
+    let fileSize = 0;
+    let fileName: string | undefined;
 
     busboy.on("field", (name, value) => {
       if (name === "data") {
@@ -58,20 +74,20 @@ export function handleAssetUpload(
 
     busboy.on("file", (_, file, info) => {
       if (fileSeen) {
-        reject(new Error("Only one file upload allowed"));
+        reject(
+          new ApiError(httpStatus.BAD_REQUEST, "Only one file upload allowed")
+        );
         file.resume();
         return;
       }
 
       fileSeen = true;
       fileMime = info.mimeType;
+      fileName = info.filename;
 
       file.on("data", (chunk: Buffer) => {
+        fileSize += chunk.length;
         fileBuffer.push(chunk);
-      });
-
-      file.on("end", () => {
-        // nothing here; we use finish to trigger upload
       });
     });
 
@@ -79,12 +95,41 @@ export function handleAssetUpload(
 
     busboy.on("finish", async () => {
       try {
+        /** ---------- FIELD VALIDATION ---------- */
+        if (validation?.fields) {
+          validateService(validation.fields, fields);
+          // validation.fields.parse(fields);
+        }
+
+        /** ---------- FILE PRESENCE ---------- */
+        if (validation?.requireFile && !fileSeen) {
+          throw new ApiError(httpStatus.BAD_REQUEST, "File is required");
+        }
+
         if (!fileSeen) {
-          return resolve({ image: { url: "", key: "" }, fields });
+          return resolve({
+            image: { url: "", key: "" },
+            fields,
+          });
         }
 
         const buffer = Buffer.concat(fileBuffer);
 
+        /** ---------- FILE VALIDATION ---------- */
+        if (validation?.file) {
+          validateService(validation.file, {
+            mimeType: fileMime,
+            size: fileSize,
+            filename: fileName,
+          });
+          // validation.file.parse({
+          //   mimeType: fileMime,
+          //   size: fileSize,
+          //   filename: fileName,
+          // });
+        }
+
+        /** ---------- UPLOAD ---------- */
         const image = await uploadToR2({
           key,
           buffer,

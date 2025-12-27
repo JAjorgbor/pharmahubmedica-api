@@ -1,4 +1,4 @@
-import swaggerDef from "@/docs/v2/swagger-def.js";
+import { createSwaggerSpec } from "@/docs/v2/swagger-def.js";
 import testRoute from "@/routes/v2/test.js";
 import usersRoute from "@/routes/v2/user.route.js";
 import express, { Router } from "express";
@@ -25,6 +25,8 @@ const defaultRoutes = [
 
 defaultRoutes.forEach((route) => router.use(route.path, route.route));
 
-router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDef));
+router.use("/docs", swaggerUi.serve, (req: any, res: any, next: any) =>
+  swaggerUi.setup(createSwaggerSpec())(req, res, next)
+);
 
 export default router;
