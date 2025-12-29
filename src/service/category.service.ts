@@ -58,9 +58,9 @@ const getVisibleCategories = async () =>
     }
   };
 
-const getCategoryById = async (id: string) => {
+const getCategory = async (filterOptions: any) => {
   try {
-    const category = await Category.findOne({ _id: id }).populate(
+    const category = await Category.findOne(filterOptions).populate(
       "subcategories"
     );
     if (!category) {
@@ -73,27 +73,6 @@ const getCategoryById = async (id: string) => {
       throw error;
     }
 
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      error.message || "Unable to fetch category",
-      false,
-      error.stack
-    );
-  }
-};
-
-const getVisibleCategoryById = async (id: string) => {
-  try {
-    const category = await Category.findOne({ _id: id, visible: true });
-    if (!category) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
-    }
-    return category;
-  } catch (error: any) {
-    if (error instanceof ApiError) {
-      // re-throw known ApiErrors without wrapping
-      throw error;
-    }
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "Unable to fetch category",
@@ -147,11 +126,11 @@ const createCategory = async (req: Request) => {
   }
 };
 
-const updateCategory = async (_id: string, req: Request) => {
+const updateCategory = async (categoryId: string, req: Request) => {
   try {
     const { image, fields } = await handleAssetUpload(
       req,
-      `categories/${_id}.jpg`,
+      `categories/${categoryId}.jpg`,
       {
         fields: adminCategoryValidation.updateCategory,
         file: customValidation.imageFileSchema,
@@ -159,10 +138,17 @@ const updateCategory = async (_id: string, req: Request) => {
       }
     );
 
-    let subcategories = fields.subcategories.map((each: Subcategory) => ({
-      ...each,
-      category: _id,
-    }));
+    let subcategories = fields.subcategories.map(
+      (each: Subcategory & { _id?: string }) => {
+        const fallbackId = new Types.ObjectId();
+
+        return {
+          ...each,
+          _id: each._id === "none" ? fallbackId : each._id,
+          category: categoryId,
+        };
+      }
+    );
 
     subcategories = await subcategoryService.updateManySubcategories(
       subcategories
@@ -173,9 +159,13 @@ const updateCategory = async (_id: string, req: Request) => {
 
     let payload: CategoryDoc = { ...fields, image };
 
-    const category = await Category.findOneAndUpdate({ _id }, payload, {
-      new: true,
-    });
+    const category = await Category.findOneAndUpdate(
+      { _id: categoryId },
+      { $set: payload },
+      {
+        new: true,
+      }
+    );
 
     return category;
   } catch (error: any) {
@@ -219,8 +209,8 @@ export default {
   createCategory,
   getCategories,
   getVisibleCategories,
-  getCategoryById,
-  getVisibleCategoryById,
+  getCategory,
+
   updateCategory,
   deleteCategory,
 };

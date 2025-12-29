@@ -14,7 +14,7 @@ const getCategories = async (req: Request, res: Response) => {
 const getCategoryById = async (req: Request, res: Response) => {
   try {
     // const pagination = getPagination(req.query);
-    const category = await categoryService.getCategoryById(req.params.id!);
+    const category = await categoryService.getCategory({ _id: req.params.id });
     res.status(200).json({ category });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

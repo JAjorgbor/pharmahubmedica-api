@@ -7,7 +7,12 @@ const createCategory = z.object({
   visible: customValidation.required(z.boolean(), "Visible is required"),
   subcategories: customValidation.required(
     z.array(
-      z.object({ name: z.string({ error: "Subcategory name is required" }) })
+      z.object({
+        name: customValidation.required(
+          z.string(),
+          "Subcategory name is required"
+        ),
+      })
     ),
     "Subcategories are required"
   ),
@@ -19,7 +24,13 @@ const updateCategory = z.object({
   visible: customValidation.required(z.boolean(), "Visible is required"),
   subcategories: customValidation.required(
     z.array(
-      z.object({ name: z.string({ error: "Subcategory name is required" }) })
+      z.object({
+        name: customValidation.required(
+          z.string(),
+          "Subcategory name is required"
+        ),
+        _id: z.union([z.string(), z.literal("none")]),
+      })
     ),
     "Subcategories are required"
   ),

@@ -17,6 +17,7 @@ type UploadValidation = {
   fields?: ZodType; // validates parsed fields
   file?: ZodType; // validates file metadata
   requireFile?: boolean;
+  callback?: (fields: any) => Promise<void>;
 };
 
 async function uploadToR2({
@@ -64,15 +65,37 @@ export function handleAssetUpload(
       if (name === "data") {
         try {
           Object.assign(fields, JSON.parse(value));
-        } catch {
-          reject(new Error("Invalid JSON in data field"));
+        } catch (error: any) {
+          reject(new ApiError(httpStatus.BAD_REQUEST, error.message));
         }
       } else {
         fields[name] = value;
       }
     });
 
-    busboy.on("file", (_, file, info) => {
+    busboy.on("file", (name, file, info) => {
+      if (name === "data") {
+        let dataBuffer = "";
+        file.on("data", (chunk: Buffer) => {
+          dataBuffer += chunk.toString();
+        });
+        file.on("end", () => {
+          try {
+            if (dataBuffer) {
+              Object.assign(fields, JSON.parse(dataBuffer));
+            }
+          } catch (error: any) {
+            reject(
+              new ApiError(
+                httpStatus.BAD_REQUEST,
+                "Invalid JSON in data file part: " + error.message
+              )
+            );
+          }
+        });
+        return;
+      }
+
       if (fileSeen) {
         reject(
           new ApiError(httpStatus.BAD_REQUEST, "Only one file upload allowed")
@@ -89,6 +112,10 @@ export function handleAssetUpload(
         fileSize += chunk.length;
         fileBuffer.push(chunk);
       });
+
+      file.on("end", () => {
+        // No additional action needed for the primary file
+      });
     });
 
     busboy.on("error", reject);
@@ -98,7 +125,7 @@ export function handleAssetUpload(
         /** ---------- FIELD VALIDATION ---------- */
         if (validation?.fields) {
           validateService(validation.fields, fields);
-          // validation.fields.parse(fields);
+          await validation?.callback?.(fields);
         }
 
         /** ---------- FILE PRESENCE ---------- */
@@ -138,6 +165,7 @@ export function handleAssetUpload(
 
         resolve({ image, fields });
       } catch (err) {
+        console.log(err);
         reject(err);
       }
     });
