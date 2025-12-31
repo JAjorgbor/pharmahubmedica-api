@@ -28,7 +28,11 @@ const required = <T extends ZodType>(schema: T, message?: string): T => {
     message: errorMsg,
   }) as T;
 };
+
+const email = required(z.email(), "Invalid email address");
+
 export default {
   imageFileSchema,
   required,
+  email,
 };

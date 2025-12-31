@@ -10,6 +10,8 @@ import compression from "compression";
 import cors from "cors";
 import helmet from "helmet";
 import { errorConverter, errorHandler } from "@/middlewares/error.js";
+import passport from "passport";
+import jwtStrategy from "@/config/passport.js";
 
 const app: Application = express();
 
@@ -24,6 +26,10 @@ app.use(helmet());
 // sanitize request data
 app.use(sanitizeXSS());
 app.use(ExpressMongoSanitize());
+
+// jwt authentication
+app.use(passport.initialize());
+passport.use("jwt", jwtStrategy);
 
 // gzip compression
 app.use(compression());

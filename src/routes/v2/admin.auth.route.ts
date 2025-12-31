@@ -1,0 +1,20 @@
+import adminAuthController from "@/controllers/admin.auth.controller.js";
+import validate from "@/middlewares/validate.js";
+import adminAuthValidation from "@/validation/admin.auth.validation.js";
+import express, { Router } from "express";
+
+const router: Router = express.Router();
+
+router.post(
+  "/create-account",
+  validate(adminAuthValidation.createAccountWithCredentials),
+  adminAuthController.createAccountWithCredentials
+);
+router.post(
+  "/login",
+  validate(adminAuthValidation.loginWithCredentials),
+  adminAuthController.loginWithCredentials
+);
+router.post("/refresh-tokens", adminAuthController.refreshTokens);
+
+export default router;

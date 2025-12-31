@@ -5,6 +5,7 @@ import express, { Router } from "express";
 import swaggerUi from "swagger-ui-express";
 import adminCategoryRoute from "@/routes/v2/admin.category.route.js";
 import adminProductRoute from "@/routes/v2/admin.product.route.js";
+import adminAuthRoute from "@/routes/v2/admin.auth.route.js";
 
 const router: Router = express.Router();
 
@@ -18,6 +19,10 @@ const defaultRoutes = [
     route: usersRoute,
   },
   // ADMIN ROUTES
+  {
+    path: "/admin/auth",
+    route: adminAuthRoute,
+  },
   {
     path: "/admin/categories",
     route: adminCategoryRoute,

@@ -1,0 +1,132 @@
+import jwt from "jsonwebtoken";
+import moment from "moment";
+import config from "@/config/config.js";
+import type { AdminUserDoc } from "@/models/admin.user.model.js";
+import tokenTypes from "@/config/tokens.js";
+import Token from "@/models/token.model.js";
+
+/**
+ * Save a token
+ * @param {string} token
+ * @param {ObjectId} user
+ * @param {Moment} expires
+ * @param {string} type
+ * @param {boolean} [blacklisted]
+ * @returns {Promise<Token>}
+ */
+const saveToken = async (
+  token: string,
+  user: { userModel: string; _id: string },
+  expires: moment.Moment,
+  type: string,
+  blacklisted = false
+) => {
+  const tokenDoc = await Token.create({
+    token,
+    user: user._id,
+    userModel: user.userModel,
+    expires: expires.toDate(),
+    type,
+    blacklisted,
+  });
+  return tokenDoc;
+};
+
+/**
+ * Generate token
+ * @param {ObjectId} userId
+ * @param {Moment} expires
+ * @param {string} type
+ * @param {string} [secret]
+ * @returns {string}
+ */
+
+const generateToken = (
+  userId: string,
+  expires: moment.Moment,
+  type: string,
+  secret = config.jwt.secret
+) => {
+  const payload = {
+    sub: userId,
+    iat: moment().unix(),
+    exp: expires.unix(),
+    type,
+  };
+  return jwt.sign(payload, secret);
+};
+
+/**
+ * Generate auth tokens
+ * @param {User} user
+ * @returns {Promise<Object>}
+ */
+const generateAuthTokens = async (
+  user: any,
+  userModel: "Admin_User" | "User",
+  includeRefresh: boolean = false
+) => {
+  const accessTokenExpires = moment().add(
+    config.jwt.accessExpirationMinutes,
+    "minutes"
+  );
+  const accessToken = generateToken(
+    user._id.toString(),
+    accessTokenExpires,
+    tokenTypes.ACCESS
+  );
+  const refreshTokenExpires = moment().add(
+    config.jwt.refreshExpirationDays,
+    "days"
+  );
+  let refreshToken;
+
+  if (includeRefresh) {
+    refreshToken = generateToken(
+      user._id.toString(),
+      refreshTokenExpires,
+      tokenTypes.REFRESH
+    );
+    await saveToken(
+      refreshToken,
+      { userModel: userModel, _id: user._id.toString() },
+      refreshTokenExpires,
+      tokenTypes.REFRESH
+    );
+  }
+  return {
+    access: {
+      token: accessToken,
+      expires: accessTokenExpires.toDate(),
+    },
+    refresh: includeRefresh
+      ? {
+          token: refreshToken,
+          expires: refreshTokenExpires.toDate(),
+        }
+      : undefined,
+  };
+};
+
+/**
+ * Verify token and return token doc (or throw an error if it is not valid)
+ * @param {string} token
+ * @param {string} type
+ * @returns {Promise<Token>}
+ */
+const verifyToken = async (token: string, type: string, userModel: string) => {
+  const payload = jwt.verify(token, config.jwt.secret);
+  const tokenDoc = await Token.findOne({
+    token,
+    type,
+    user: payload.sub!,
+    userModel,
+    blacklisted: false,
+  });
+  if (!tokenDoc) {
+    throw new Error("Token not found");
+  }
+  return tokenDoc;
+};
+
+export default { saveToken, generateToken, verifyToken, generateAuthTokens };

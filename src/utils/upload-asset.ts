@@ -1,6 +1,6 @@
 import config from "@/config/config.js";
 import ApiError from "@/utils/api-error.js";
-import r2 from "@/utils/r2-client.js";
+import r2 from "@/config/r2-client.js";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import Busboy from "busboy";
 import type { Request } from "express";
