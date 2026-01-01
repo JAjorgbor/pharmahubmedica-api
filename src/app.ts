@@ -12,12 +12,14 @@ import helmet from "helmet";
 import { errorConverter, errorHandler } from "@/middlewares/error.js";
 import passport from "passport";
 import jwtStrategy from "@/config/passport.js";
+import config from "@/config/config.js";
 
 const app: Application = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
+  `http://localhost:${config.port}`,
   "https://pharmahubmedica.ng",
   "https://sandbox.pharmahubmedica.ng",
   "https://v2.pharmahubmedica.ng",
