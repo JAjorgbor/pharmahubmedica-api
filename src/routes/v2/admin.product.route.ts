@@ -1,16 +1,25 @@
 import express, { Router } from "express";
 import adminProductController from "@/controllers/admin.product.controller.js";
+import auth from "@/middlewares/auth.js";
 
 const router: Router = express.Router();
 
-router.get("/", adminProductController.getProducts);
+router.get("/", auth("getInventory"), adminProductController.getProducts);
 
-router.get("/:id", adminProductController.getProductById);
+router.get("/:id", auth("getInventory"), adminProductController.getProductById);
 
-router.post("/", adminProductController.createProduct);
+router.post("/", auth("updateInventory"), adminProductController.createProduct);
 
-router.patch("/:id", adminProductController.updateProduct);
+router.patch(
+  "/:id",
+  auth("updateInventory"),
+  adminProductController.updateProduct
+);
 
-router.delete("/:id", adminProductController.deleteProduct);
+router.delete(
+  "/:id",
+  auth("updateInventory"),
+  adminProductController.deleteProduct
+);
 
 export default router;
