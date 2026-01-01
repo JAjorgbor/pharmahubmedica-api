@@ -15,10 +15,10 @@ const createAccountWithCredentials = catchAsync(
       "Admin_User",
       true
     );
-    res.cookie("refreshToken", tokens.refresh?.token!, {
+    res.cookie("adminRefreshToken", tokens.refresh?.token!, {
       httpOnly: true,
       secure: config.env === "production", // only in production
-      sameSite: "strict",
+      sameSite: config.env === "production" ? "strict" : "lax",
     });
 
     res.status(httpStatus.CREATED).json({
@@ -38,10 +38,10 @@ const loginWithCredentials = catchAsync(async (req: Request, res: Response) => {
     "Admin_User",
     true
   );
-  res.cookie("refreshToken", tokens.refresh?.token!, {
+  res.cookie("adminRefreshToken", tokens.refresh?.token!, {
     httpOnly: true,
     secure: config.env === "production", // only in production
-    sameSite: "strict",
+    sameSite: config.env === "production" ? "strict" : "lax",
   });
 
   res.status(httpStatus.CREATED).json({
@@ -51,7 +51,9 @@ const loginWithCredentials = catchAsync(async (req: Request, res: Response) => {
 });
 
 const refreshTokens = catchAsync(async (req: Request, res: Response) => {
-  const tokens = await adminAuthService.refreshAuth(req.cookies.refreshToken);
+  const tokens = await adminAuthService.refreshAuth(
+    req.cookies.adminRefreshToken
+  );
   res.send({ accessToken: tokens.access.token });
 });
 

@@ -15,6 +15,14 @@ import jwtStrategy from "@/config/passport.js";
 
 const app: Application = express();
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://pharmahubmedica.ng",
+  "https://sandbox.pharmahubmedica.ng",
+  "https://v2.pharmahubmedica.ng",
+];
+
 /* Middleware */
 app.use(logger("dev"));
 app.use(express.json());
@@ -35,8 +43,34 @@ passport.use("jwt", jwtStrategy);
 app.use(compression());
 
 // enable cors
-app.use(cors());
-app.options("*", cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (like Postman, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // allows cookies
+  })
+);
+app.options(
+  "*",
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 /* Routes */
 app.use("/v2", routes);

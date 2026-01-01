@@ -49,11 +49,13 @@ const categorySchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-export type Category = InferSchemaType<typeof categorySchema>;
-export type CategoryDoc = HydratedDocument<Category>;
+export type CategoryType = InferSchemaType<typeof categorySchema>;
+export type CategoryDoc = HydratedDocument<CategoryType>;
 
 categorySchema.pre("validate", async function () {
   if (this.isModified("name")) {
@@ -85,6 +87,13 @@ categorySchema.pre(
   }
 );
 
-const Category = mongoose.model<Category>("Category", categorySchema);
+categorySchema.virtual("productsCount", {
+  ref: "Product",
+  localField: "_id",
+  foreignField: "category",
+  count: true, // <-- key: returns a number, not docs
+});
+
+const Category = mongoose.model<CategoryType>("Category", categorySchema);
 
 export default Category;

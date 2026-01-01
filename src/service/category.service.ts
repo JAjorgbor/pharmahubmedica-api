@@ -1,4 +1,7 @@
-import Category, { type CategoryDoc } from "@/models/category.model.js";
+import Category, {
+  type CategoryDoc,
+  type CategoryType,
+} from "@/models/category.model.js";
 import type {
   Subcategory,
   SubcategoryDoc,
@@ -19,7 +22,9 @@ const getCategories = async () =>
     // const { limit, skip, getPaginationMeta } = pagination;
 
     try {
-      const categories = await Category.find().populate("subcategories");
+      const categories = await Category.find()
+        .populate("subcategories")
+        .populate("productsCount");
       // .skip(skip).limit(limit);
       // const total = await Category.countDocuments();
 
@@ -41,9 +46,9 @@ const getVisibleCategories = async () =>
   {
     // const { limit, skip, getPaginationMeta } = pagination;
     try {
-      const categories = await Category.find({ visible: true }).populate(
-        "subcategories"
-      );
+      const categories = await Category.find({ visible: true })
+        .populate("subcategories")
+        .populate("productsCount");
 
       // const total = await Category.countDocuments({ visible: true });
       // const meta = getPaginationMeta(total, categories.length);
@@ -60,9 +65,9 @@ const getVisibleCategories = async () =>
 
 const getCategory = async (filterOptions: any) => {
   try {
-    const category = await Category.findOne(filterOptions).populate(
-      "subcategories"
-    );
+    const category = await Category.findOne(filterOptions)
+      .populate("subcategories")
+      .populate("productsCount");
     if (!category) {
       throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
     }
@@ -184,9 +189,13 @@ const updateCategory = async (categoryId: string, req: Request) => {
 
 const deleteCategory = async (id: string) => {
   try {
-    const category = await Category.findById(id);
+    const category = await Category.findById(id).populate("productsCount");
     if (!category)
       throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
+
+    if ((category as any).productsCount > 0) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Category has products");
+    }
 
     await category.deleteOne();
 

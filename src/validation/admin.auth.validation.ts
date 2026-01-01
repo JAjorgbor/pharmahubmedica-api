@@ -27,7 +27,7 @@ const createAccountWithCredentials = {
 const loginWithCredentials = {
   body: z.object({
     email: customValidation.email,
-    password: customValidation.required(z.string().min(8)),
+    password: customValidation.required(z.string().min(6)),
   }),
 };
 

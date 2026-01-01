@@ -1,16 +1,17 @@
 import express, { Router } from "express";
 import adminCategoryController from "@/controllers/admin.category.controller.js";
+import auth from "@/middlewares/auth.js";
 
 const router: Router = express.Router();
 
-router.get("/", adminCategoryController.getCategories);
+router.get("/", auth(), adminCategoryController.getCategories);
 
-router.get("/:id", adminCategoryController.getCategoryById);
+router.get("/:id", auth(), adminCategoryController.getCategoryById);
 
-router.post("/", adminCategoryController.createCategory);
+router.post("/", auth(), adminCategoryController.createCategory);
 
-router.patch("/:id", adminCategoryController.updateCategory);
+router.patch("/:id", auth(), adminCategoryController.updateCategory);
 
-router.delete("/:id", adminCategoryController.deleteCategory);
+router.delete("/:id", auth(), adminCategoryController.deleteCategory);
 
 export default router;
