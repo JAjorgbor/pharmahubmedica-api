@@ -28,6 +28,11 @@ const verifyCallback =
         new ApiError(httpStatus.UNAUTHORIZED, "Invalid token for admin access")
       );
     }
+    if (adminUser.status !== "active") {
+      return reject(
+        new ApiError(httpStatus.UNAUTHORIZED, "Your account is not active")
+      );
+    }
 
     if (requiredRights.length) {
       const userRights = roles.roleRights.get(user.role) || [];

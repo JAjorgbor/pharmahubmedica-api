@@ -80,7 +80,33 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /admin/auth/logout:
+    post:
+      tags:
+        - Admin Auth
+      summary: Logout of admin account
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     CreateAdminAccountInput:
       type: object

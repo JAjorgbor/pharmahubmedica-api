@@ -52,8 +52,15 @@ const refreshTokens = catchAsync(async (req: Request, res: Response) => {
   res.send({ accessToken: tokens.access.token });
 });
 
+const logout = catchAsync(async (req: Request, res: Response) => {
+  await adminAuthService.logout(req.cookies.adminRefreshToken);
+  res.clearCookie("adminRefreshToken");
+  res.send({ message: "Logged out" });
+});
+
 export default {
   createAccountWithCredentials,
   refreshTokens,
   loginWithCredentials,
+  logout,
 };

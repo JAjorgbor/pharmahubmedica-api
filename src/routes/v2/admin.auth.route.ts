@@ -1,4 +1,5 @@
 import adminAuthController from "@/controllers/admin.auth.controller.js";
+import auth from "@/middlewares/auth.js";
 import validate from "@/middlewares/validate.js";
 import adminAuthValidation from "@/validation/admin.auth.validation.js";
 import express, { Router } from "express";
@@ -15,6 +16,7 @@ router.post(
   validate(adminAuthValidation.loginWithCredentials),
   adminAuthController.loginWithCredentials
 );
+router.post("/logout", auth(), adminAuthController.logout);
 router.post("/refresh-tokens", adminAuthController.refreshTokens);
 
 export default router;
