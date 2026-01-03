@@ -3,7 +3,7 @@ import httpStatus from "http-status";
 import AdminUserService from "./admin.user.service.js";
 import type { AdminUserDoc } from "@/models/admin.user.model.js";
 import tokenTypes from "@/config/tokens.js";
-import tokenService from "@/service/token.service.js";
+import tokenService from "@/services/token.service.js";
 
 const loginWithCredentials = async (email: string, password: string) => {
   const user = await AdminUserService.getAdminUser({ email });
@@ -25,12 +25,14 @@ const refreshAuth = async (refreshToken: string) => {
       tokenTypes.REFRESH,
       "Admin_User"
     );
-    const user = await AdminUserService.getAdminUser(refreshTokenDoc.user);
+    const user = await AdminUserService.getAdminUser({
+      _id: String(refreshTokenDoc.user),
+    });
     if (!user) {
       throw new Error();
     }
     // await refreshTokenDoc.deleteOne();
-    return tokenService.generateAuthTokens(user, "Admin_User");
+    return tokenService.generateAuthTokens(user, "Admin_User", false);
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
   }

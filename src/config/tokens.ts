@@ -5,7 +5,7 @@ const tokenTypes = {
   VERIFY_EMAIL: "verifyEmail",
   UPDATE_EMAIL: "updateEmail",
   VERIFY_OTP: "verifyOTP",
-  INVITE_CONSOLE_USER: "inviteConsoleUser",
+  INVITE_ADMIN_USER: "inviteConsoleUser",
 };
 
 export default tokenTypes;

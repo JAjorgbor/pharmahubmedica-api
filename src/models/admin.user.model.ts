@@ -35,7 +35,7 @@ const adminUserSchema = new mongoose.Schema({
 
   password: {
     type: String,
-    required: true,
+    // required: true,
     trim: true,
     minlength: 6,
     validate(value: string) {
@@ -89,13 +89,13 @@ adminUserSchema.methods.isPasswordMatch = async function (password: string) {
 
 adminUserSchema.pre("save", async function (next) {
   const adminUser = this;
-  if (this.isModified("password")) {
+  if (this.isModified("password") && adminUser.password) {
     adminUser.password = await bcrypt.hash(adminUser.password, 8);
   }
 });
 
-export type AdminUser = InferSchemaType<typeof adminUserSchema>;
-export type AdminUserDoc = HydratedDocument<AdminUser>;
+export type AdminUserType = InferSchemaType<typeof adminUserSchema>;
+export type AdminUserDoc = HydratedDocument<AdminUserType>;
 
 const AdminUser = mongoose.model("Admin_User", adminUserSchema);
 

@@ -1,5 +1,5 @@
 import Product, { type ProductDoc } from "@/models/product.model.js";
-import categoryService from "@/service/category.service.js";
+import categoryService from "@/services/category.service.js";
 import ApiError from "@/utils/api-error.js";
 import { handleAssetUpload } from "@/utils/upload-asset.js";
 import customValidation from "@/validation/custom.validation.js";

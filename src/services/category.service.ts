@@ -7,7 +7,7 @@ import type {
   SubcategoryDoc,
 } from "@/models/subcategory.model.js";
 import SubcategoryModel from "@/models/subcategory.model.js";
-import subcategoryService from "@/service/subcategory.service.js";
+import subcategoryService from "@/services/subcategory.service.js";
 import ApiError from "@/utils/api-error.js";
 import { handleAssetUpload } from "@/utils/upload-asset.js";
 import adminCategoryValidation from "@/validation/category.validation.js";

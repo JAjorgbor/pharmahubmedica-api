@@ -113,6 +113,9 @@ importers:
       passport-jwt:
         specifier: ^4.0.1
         version: 4.0.1
+      sendpulse-api:
+        specifier: ^1.1.7
+        version: 1.1.7
       slugify:
         specifier: ^1.6.6
         version: 1.6.6
@@ -1594,6 +1597,9 @@ packages:
   send@0.16.2:
     resolution: {integrity: sha512-E64YFPUssFHEFBvpbbjr44NCLtI1AohxQ8ZSiJjQLskAdKuriYEP6VyGEsRDH8ScozGpkaX1BGvhanqCwkcEZw==}
     engines: {node: '>= 0.8.0'}
+
+  sendpulse-api@1.1.7:
+    resolution: {integrity: sha512-Jb/9mcMN1Cs/5iHDQ+EURXfUzhJAz3W9yeAfPnVoHhTsj2Cx9n9oqqxvwZay1kTSbweVNIrLCt12ku31IufQfw==}
 
   serve-static@1.13.2:
     resolution: {integrity: sha512-p/tdJrO4U387R9oMjb1oj7qSMaMfmOyd4j9hOFoxZe2baQszgHcSWjuya/CiT5kgZZKRudHNOA0pYXOl8rQ5nw==}
@@ -3695,6 +3701,8 @@ snapshots:
       statuses: 1.4.0
     transitivePeerDependencies:
       - supports-color
+
+  sendpulse-api@1.1.7: {}
 
   serve-static@1.13.2:
     dependencies:

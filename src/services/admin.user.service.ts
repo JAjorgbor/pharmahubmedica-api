@@ -1,8 +1,13 @@
-import AdminUser from "@/models/admin.user.model.js";
+import AdminUser, {
+  type AdminUserDoc,
+  type AdminUserType,
+} from "@/models/admin.user.model.js";
 import ApiError from "@/utils/api-error.js";
 import httpStatus from "http-status";
 
-const getAdminUser = async (filterParams: any) => {
+const getAdminUser = async (
+  filterParams: Partial<AdminUserType & { _id: string }>
+) => {
   return await AdminUser.findOne(filterParams);
 };
 

@@ -1,4 +1,4 @@
-import productService from "@/service/product.service.js";
+import productService from "@/services/product.service.js";
 import type { Request, Response } from "express";
 
 const getProducts = async (req: Request, res: Response) => {

@@ -5,6 +5,7 @@ import { z } from "zod";
 const envVarsSchema = z.object({
   NODE_ENV: z.enum(["production", "development", "test"]),
   PORT: z.coerce.number().default(5500),
+  WEBSITE_URL: z.string(),
   DATABASE_NAME: z.string(),
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string(),
@@ -14,16 +15,18 @@ const envVarsSchema = z.object({
   JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: z.coerce.number().default(10),
   JWT_VERIFY_OTP_EXPIRATION_MINUTES: z.coerce.number().default(10),
   JWT_UPDATE_EMAIL_EXPIRATION_MINUTES: z.coerce.number().default(10),
+  JWT_ACCEPT_INVITE_VALIDITY_DAYS: z.coerce.number().default(10),
   R2_BUCKET: z.string(),
   R2_ACCESS_KEY: z.string(),
   R2_SECRET_KEY: z.string(),
   R2_ENDPOINT: z.string(),
   R2_PUBLIC_URL: z.string(),
-  //   SMTP_HOST: z.string(),
-  //   SMTP_PORT: z.coerce.number(),
-  //   EMAIL_FROM: z.string(),
-  //   SMTP_USERNAME: z.string(),
-  //   SMTP_PASSWORD: z.string(),
+  EMAIL_FROM_NAME: z.string(),
+  EMAIL_FROM_ADDRESS: z.string(),
+  SMTP_CLIENT_ID: z.string(),
+  SMTP_CLIENT_SECRET: z.string(),
+  // SMTP_USERNAME: z.string(),
+  // SMTP_PASSWORD: z.string(),
   //   GOOGLE_SERVICE_ACCOUNT: z.string(),
 });
 
@@ -37,6 +40,7 @@ if (!envVars.success) {
 export default {
   env: envVars.data.NODE_ENV,
   port: envVars.data.PORT,
+  websiteUrl: envVars.data.WEBSITE_URL,
   mongoose: {
     url:
       envVars.data.DATABASE_URL +
@@ -56,6 +60,7 @@ export default {
     verifyOTPExpirationMinutes: envVars.data.JWT_VERIFY_OTP_EXPIRATION_MINUTES,
     updateEmailExpirationMinutes:
       envVars.data.JWT_UPDATE_EMAIL_EXPIRATION_MINUTES,
+    acceptInviteValidityDays: envVars.data.JWT_ACCEPT_INVITE_VALIDITY_DAYS,
   },
   r2: {
     bucket: envVars.data.R2_BUCKET,
@@ -64,15 +69,18 @@ export default {
     endpoint: envVars.data.R2_ENDPOINT,
     publicUrl: envVars.data.R2_PUBLIC_URL,
   },
-  //   email: {
-  //     smtp: {
-  //       host: envVars.SMTP_HOST,
-  //       port: envVars.SMTP_PORT,
-  //       auth: {
-  //         user: envVars.SMTP_USERNAME,
-  //         pass: envVars.SMTP_PASSWORD,
-  //       },
-  //     },
-  //     from: envVars.EMAIL_FROM,
-  //   },
+  email: {
+    smtp: {
+      clientId: envVars.data.SMTP_CLIENT_ID,
+      clientSecret: envVars.data.SMTP_CLIENT_SECRET,
+      // auth: {
+      //   user: envVars.SMTP_USERNAME,
+      //   pass: envVars.SMTP_PASSWORD,
+      // },
+    },
+    from: {
+      name: envVars.data.EMAIL_FROM_NAME,
+      address: envVars.data.EMAIL_FROM_ADDRESS,
+    },
+  },
 };

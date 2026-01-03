@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import config from "@/config/config.js";
-import type { AdminUserDoc } from "@/models/admin.user.model.js";
+import type { AdminUserDoc, AdminUserType } from "@/models/admin.user.model.js";
 import tokenTypes from "@/config/tokens.js";
 import Token from "@/models/token.model.js";
 
@@ -64,7 +64,7 @@ const generateToken = (
 const generateAuthTokens = async (
   user: any,
   userModel: "Admin_User" | "User",
-  includeRefresh: boolean = false
+  includeRefresh: boolean = true
 ) => {
   const accessTokenExpires = moment().add(
     config.jwt.accessExpirationMinutes,
@@ -129,4 +129,35 @@ const verifyToken = async (token: string, type: string, userModel: string) => {
   return tokenDoc;
 };
 
-export default { saveToken, generateToken, verifyToken, generateAuthTokens };
+/**
+ * Generate invite admin user token
+ * @param {object} payload (contains role, firstName, lastName, email)
+ * @returns {Promise<string>}
+ */
+const generateAdminUserInviteToken = async (payload: AdminUserType) => {
+  const JWTPayload = {
+    ...payload,
+    iat: moment().unix(),
+    exp: moment().add(config.jwt.acceptInviteValidityDays, "days").unix(),
+    type: tokenTypes.INVITE_ADMIN_USER,
+  };
+  return jwt.sign(JWTPayload, config.jwt.secret);
+};
+
+/**
+ * Get invite admin user token payload
+ * @param {string} token (token from accept invite)
+ * @returns {Promise<object>} (containing role, firstName, lastName, email...)
+ */
+const getAdminUserPayloadFromToken = async (token: string) => {
+  return jwt.verify(token, config.jwt.secret);
+};
+
+export default {
+  saveToken,
+  generateToken,
+  verifyToken,
+  generateAuthTokens,
+  generateAdminUserInviteToken,
+  getAdminUserPayloadFromToken,
+};
