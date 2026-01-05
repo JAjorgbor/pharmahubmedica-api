@@ -4,6 +4,8 @@ import adminCategoryRoute from "@/routes/v2/admin.category.route.js";
 import adminProductRoute from "@/routes/v2/admin.product.route.js";
 import adminTeamRoute from "@/routes/v2/admin.team.route.js";
 import adminUserRoute from "@/routes/v2/admin.user.route.js";
+import categoryRoute from "@/routes/v2/category.route.js";
+import productRoute from "@/routes/v2/product.route.js";
 import testRoute from "@/routes/v2/test.js";
 import usersRoute from "@/routes/v2/user.route.js";
 import express, { Router } from "express";
@@ -19,6 +21,14 @@ const defaultRoutes = [
   {
     path: "/users",
     route: usersRoute,
+  },
+  {
+    path: "/products",
+    route: productRoute,
+  },
+  {
+    path: "/categories",
+    route: categoryRoute,
   },
   // ADMIN ROUTES
   {

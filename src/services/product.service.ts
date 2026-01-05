@@ -1,6 +1,7 @@
 import Product, { type ProductDoc } from "@/models/product.model.js";
 import categoryService from "@/services/category.service.js";
 import ApiError from "@/utils/api-error.js";
+import type { PaginationResult } from "@/utils/pagination.js";
 import { handleAssetUpload } from "@/utils/upload-asset.js";
 import customValidation from "@/validation/custom.validation.js";
 import productValidation from "@/validation/product.validation.js";
@@ -45,13 +46,28 @@ const getProducts = async () => {
   }
 };
 
-const getVisibleProducts = async () => {
+const getVisibleProductsForCategory = async (
+  categoryId: string,
+  pagination: PaginationResult
+) => {
   try {
-    const products = await Product.find({ visible: true })
+    const { limit, skip, getPaginationMeta } = pagination;
+    const products = await Product.find({
+      visible: true,
+      category: categoryId,
+    })
       .populate("category")
-      .populate("subcategory");
+      .populate("subcategory")
+      .skip(skip)
+      .limit(limit);
+    const total = await Product.countDocuments({
+      visible: true,
+      category: categoryId,
+    });
 
-    return products;
+    const meta = getPaginationMeta(total, products.length);
+
+    return { products, meta };
   } catch (error: any) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -183,6 +199,6 @@ export default {
   getProducts,
   createProduct,
   updateProduct,
-  getVisibleProducts,
+  getVisibleProductsForCategory,
   deleteProduct,
 };

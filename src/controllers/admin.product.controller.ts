@@ -1,52 +1,33 @@
 import productService from "@/services/product.service.js";
 import type { Request, Response } from "express";
+import catchAsync from "@/utils/catch-async.js";
 
-const getProducts = async (req: Request, res: Response) => {
-  try {
-    // const pagination = getPagination(req.query);
-    const products = await productService.getProducts();
-    res.status(200).json({ products });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
+const getProducts = catchAsync(async (req: Request, res: Response) => {
+  // const pagination = getPagination(req.query);
+  const products = await productService.getProducts();
+  res.status(200).json({ products });
+});
 
-const getProductById = async (req: Request, res: Response) => {
-  try {
-    // const pagination = getPagination(req.query);
-    const product = await productService.getProduct({ _id: req.params.id });
-    res.status(200).json({ product });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
+const getProductById = catchAsync(async (req: Request, res: Response) => {
+  // const pagination = getPagination(req.query);
+  const product = await productService.getProduct({ _id: req.params.id });
+  res.status(200).json({ product });
+});
 
-const createProduct = async (req: Request, res: Response) => {
-  try {
-    const product = await productService.createProduct(req);
-    res.status(201).json({ product });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
+const createProduct = catchAsync(async (req: Request, res: Response) => {
+  const product = await productService.createProduct(req);
+  res.status(201).json({ product });
+});
 
-const updateProduct = async (req: Request, res: Response) => {
-  try {
-    const product = await productService.updateProduct(req.params.id!, req);
-    res.status(201).json({ product });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
+const updateProduct = catchAsync(async (req: Request, res: Response) => {
+  const product = await productService.updateProduct(req.params.id!, req);
+  res.status(201).json({ product });
+});
 
-const deleteProduct = async (req: Request, res: Response) => {
-  try {
-    const message = await productService.deleteProduct(req.params.id!);
-    res.status(201).json({ message });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
+const deleteProduct = catchAsync(async (req: Request, res: Response) => {
+  const message = await productService.deleteProduct(req.params.id!);
+  res.status(201).json({ message });
+});
 
 export default {
   getProducts,

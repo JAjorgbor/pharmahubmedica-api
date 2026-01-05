@@ -1,14 +1,11 @@
-import Category, {
-  type CategoryDoc,
-  type CategoryType,
-} from "@/models/category.model.js";
+import Category, { type CategoryDoc } from "@/models/category.model.js";
 import type {
   Subcategory,
   SubcategoryDoc,
 } from "@/models/subcategory.model.js";
-import SubcategoryModel from "@/models/subcategory.model.js";
 import subcategoryService from "@/services/subcategory.service.js";
 import ApiError from "@/utils/api-error.js";
+import type { PaginationResult } from "@/utils/pagination.js";
 import { handleAssetUpload } from "@/utils/upload-asset.js";
 import adminCategoryValidation from "@/validation/category.validation.js";
 import customValidation from "@/validation/custom.validation.js";
@@ -41,27 +38,27 @@ const getCategories = async () =>
     }
   };
 
-const getVisibleCategories = async () =>
-  // pagination: PaginationResult
-  {
-    // const { limit, skip, getPaginationMeta } = pagination;
-    try {
-      const categories = await Category.find({ visible: true })
-        .populate("subcategories")
-        .populate("productsCount");
+const getVisibleCategories = async (pagination: PaginationResult) => {
+  const { limit, skip, getPaginationMeta } = pagination;
+  try {
+    const categories = await Category.find({ visible: true })
+      .populate("subcategories")
+      .populate("productsCount")
+      .skip(skip)
+      .limit(limit);
 
-      // const total = await Category.countDocuments({ visible: true });
-      // const meta = getPaginationMeta(total, categories.length);
-      return categories;
-    } catch (error: any) {
-      throw new ApiError(
-        httpStatus.INTERNAL_SERVER_ERROR,
-        error.message || "Unable to fetch categories",
-        false,
-        error.stack
-      );
-    }
-  };
+    const total = await Category.countDocuments({ visible: true });
+    const meta = getPaginationMeta(total, categories.length);
+    return { categories, meta };
+  } catch (error: any) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      error.message || "Unable to fetch categories",
+      false,
+      error.stack
+    );
+  }
+};
 
 const getCategory = async (filterOptions: any) => {
   try {
