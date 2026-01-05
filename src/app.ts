@@ -1,5 +1,4 @@
 import express, { type Application } from "express";
-import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 
@@ -30,6 +29,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 // set security HTTP headers
 app.use(helmet());
 
@@ -44,43 +44,41 @@ passport.use("jwt", jwtStrategy);
 // gzip compression
 app.use(compression());
 
-// enable cors
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // allow requests with no origin (like Postman, curl)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true, // allows cookies
-  })
-);
-app.options(
-  "*",
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+// Ensure CORS headers are present even when errors happen (incl. preflight)
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
+  next();
+});
+
+// enable cors (single config used for both normal + preflight)
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 /* Routes */
 app.use("/v2", routes);
 
-//  Convert any thrown errors to ApiError
+// Convert any thrown errors to ApiError
 app.use(errorConverter);
 
-//  Send the formatted error response
+// Send the formatted error response
 app.use(errorHandler);
 
 export default app;
