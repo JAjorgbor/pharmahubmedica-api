@@ -71,7 +71,7 @@ paths:
     get:
       tags:
         - Categories
-      summary: Get visible products for a specific category with pagination
+      summary: Get visible products for a specific category with pagination and filters
       parameters:
         - name: slug
           in: path
@@ -93,6 +93,28 @@ paths:
             type: integer
             default: 10
           description: Number of items per page
+        - name: minPrice
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Minimum price filter
+        - name: maxPrice
+          in: query
+          required: false
+          schema:
+            type: number
+          description: Maximum price filter
+        - name: subcategories
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: List of subcategory slugs to filter by
       responses:
         "200":
           description: List of products and pagination metadata
@@ -107,6 +129,9 @@ paths:
                       $ref: "#/components/schemas/Product"
                   meta:
                     $ref: "#/components/schemas/PaginationMeta"
+                  maxPrice:
+                    type: number
+                    description: The maximum price found among products in this category
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
