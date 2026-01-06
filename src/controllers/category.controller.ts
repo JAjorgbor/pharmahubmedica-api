@@ -22,6 +22,15 @@ const getCategory = catchAsync(async (req: Request, res: Response) => {
 
 const getCategoryProducts = catchAsync(async (req: Request, res: Response) => {
   const pagination = getPagination(req.query);
+  const max = req.query.maxPrice as string;
+  const min = req.query.minPrice as string;
+  const subcategorySlugs = (
+    Array.isArray(req.query.subcategories)
+      ? req.query.subcategories
+      : req.query.subcategories
+      ? [req.query.subcategories]
+      : []
+  ) as string[];
   const category = await categoryService.getCategory({
     slug: req.params.slug,
     visible: true,
@@ -31,7 +40,8 @@ const getCategoryProducts = catchAsync(async (req: Request, res: Response) => {
   }
   const result = await productService.getVisibleProductsForCategory(
     category._id.toString(),
-    pagination
+    pagination,
+    { priceRange: { max, min }, subcategorySlugs }
   );
   res.status(200).json(result);
 });

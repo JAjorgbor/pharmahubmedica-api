@@ -1,4 +1,5 @@
 import Product, { type ProductDoc } from "@/models/product.model.js";
+import Subcategory from "@/models/subcategory.model.js";
 import categoryService from "@/services/category.service.js";
 import ApiError from "@/utils/api-error.js";
 import type { PaginationResult } from "@/utils/pagination.js";
@@ -48,26 +49,65 @@ const getProducts = async () => {
 
 const getVisibleProductsForCategory = async (
   categoryId: string,
-  pagination: PaginationResult
+  pagination: PaginationResult,
+  filterOptions?: {
+    priceRange?: { max: string; min: string };
+    subcategorySlugs?: string[];
+  }
 ) => {
   try {
     const { limit, skip, getPaginationMeta } = pagination;
-    const products = await Product.find({
+    let products = [];
+    let total = 0;
+
+    const filter: Record<string, any> = {
       visible: true,
       category: categoryId,
-    })
+    };
+
+    if (filterOptions) {
+      let subcategories = [];
+      if (filterOptions.subcategorySlugs?.length) {
+        subcategories = await Subcategory.find({
+          slug: { $in: filterOptions.subcategorySlugs },
+          category: categoryId,
+        }).select("_id");
+      }
+
+      if (subcategories.length) {
+        filter.subcategory = { $in: subcategories };
+      }
+      if (filterOptions.priceRange) {
+        filter.price = {
+          $gte: Number(filterOptions.priceRange?.min || 0),
+          $lte: Number(
+            filterOptions.priceRange?.max || Number.MAX_SAFE_INTEGER
+          ),
+        };
+      }
+    }
+    products = await Product.find(filter)
       .populate("category")
       .populate("subcategory")
       .skip(skip)
       .limit(limit);
-    const total = await Product.countDocuments({
-      visible: true,
-      category: categoryId,
-    });
+    total = await Product.countDocuments(filter);
+
+    const maxPriceQueryResult = await Product.aggregate([
+      { $match: { visible: true } },
+      {
+        $group: {
+          _id: null,
+          maxPrice: { $max: "$price" },
+        },
+      },
+    ]);
+
+    const maxPrice = maxPriceQueryResult[0]?.maxPrice ?? 0;
 
     const meta = getPaginationMeta(total, products.length);
 
-    return { products, meta };
+    return { products, meta, maxPrice };
   } catch (error: any) {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
