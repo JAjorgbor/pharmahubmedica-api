@@ -11,40 +11,22 @@ import httpStatus from "http-status";
 import { Types } from "mongoose";
 
 const getProduct = async (filterOptions: any) => {
-  try {
-    const product = await Product.findOne(filterOptions)
-      .populate("category")
-      .populate("subcategory");
+  const product = await Product.findOne(filterOptions)
+    .populate("category")
+    .populate("subcategory");
 
-    if (!product) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
-    }
-    return product;
-  } catch (error: any) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      error.message || "Unable to fetch product",
-      false,
-      error.stack
-    );
+  if (!product) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
   }
+  return product;
 };
 
 const getProducts = async () => {
-  try {
-    const products = await Product.find()
-      .populate("category")
-      .populate("subcategory");
+  const products = await Product.find()
+    .populate("category")
+    .populate("subcategory");
 
-    return products;
-  } catch (error: any) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      error.message || "Unable to fetch products",
-      false,
-      error.stack
-    );
-  }
+  return products;
 };
 
 const getVisibleProductsForCategory = async (
@@ -55,183 +37,137 @@ const getVisibleProductsForCategory = async (
     subcategorySlugs?: string[];
   }
 ) => {
-  try {
-    const { limit, skip, getPaginationMeta } = pagination;
-    let products = [];
-    let total = 0;
+  const { limit, skip, getPaginationMeta } = pagination;
+  let products = [];
+  let total = 0;
 
-    const filter: Record<string, any> = {
-      visible: true,
-      category: categoryId,
-    };
+  const filter: Record<string, any> = {
+    visible: true,
+    category: categoryId,
+  };
 
-    if (filterOptions) {
-      let subcategories = [];
-      if (filterOptions.subcategorySlugs?.length) {
-        subcategories = await Subcategory.find({
-          slug: { $in: filterOptions.subcategorySlugs },
-          category: categoryId,
-        }).select("_id");
-      }
-
-      if (subcategories.length) {
-        filter.subcategory = { $in: subcategories };
-      }
-      if (filterOptions.priceRange) {
-        filter.price = {
-          $gte: Number(filterOptions.priceRange?.min || 0),
-          $lte: Number(
-            filterOptions.priceRange?.max || Number.MAX_SAFE_INTEGER
-          ),
-        };
-      }
+  if (filterOptions) {
+    let subcategories = [];
+    if (filterOptions.subcategorySlugs?.length) {
+      subcategories = await Subcategory.find({
+        slug: { $in: filterOptions.subcategorySlugs },
+        category: categoryId,
+      }).select("_id");
     }
-    products = await Product.find(filter)
-      .populate("category")
-      .populate("subcategory")
-      .skip(skip)
-      .limit(limit);
-    total = await Product.countDocuments(filter);
 
-    const maxPriceQueryResult = await Product.aggregate([
-      { $match: { visible: true } },
-      {
-        $group: {
-          _id: null,
-          maxPrice: { $max: "$price" },
-        },
-      },
-    ]);
-
-    const maxPrice = maxPriceQueryResult[0]?.maxPrice ?? 0;
-
-    const meta = getPaginationMeta(total, products.length);
-
-    return { products, meta, maxPrice };
-  } catch (error: any) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      error.message || "Unable to fetch products",
-      false,
-      error.stack
-    );
+    if (subcategories.length) {
+      filter.subcategory = { $in: subcategories };
+    }
+    if (filterOptions.priceRange) {
+      filter.price = {
+        $gte: Number(filterOptions.priceRange?.min || 0),
+        $lte: Number(filterOptions.priceRange?.max || Number.MAX_SAFE_INTEGER),
+      };
+    }
   }
+  products = await Product.find(filter)
+    .populate("category")
+    .populate("subcategory")
+    .skip(skip)
+    .limit(limit);
+  total = await Product.countDocuments(filter);
+
+  const maxPriceQueryResult = await Product.aggregate([
+    { $match: { visible: true } },
+    {
+      $group: {
+        _id: null,
+        maxPrice: { $max: "$price" },
+      },
+    },
+  ]);
+
+  const maxPrice = maxPriceQueryResult[0]?.maxPrice ?? 0;
+
+  const meta = getPaginationMeta(total, products.length);
+
+  return { products, meta, maxPrice };
 };
 
 const createProduct = async (req: Request) => {
-  try {
-    const _id = new Types.ObjectId();
+  const _id = new Types.ObjectId();
 
-    let payload: ProductDoc;
-    const { image, fields } = await handleAssetUpload(
-      req,
-      `products/${_id}.jpg`,
-      {
-        fields: productValidation.createProduct,
-        file: customValidation.imageFileSchema,
-        requireFile: true,
-        callback: async (parsedFields) => {
-          const category = await categoryService.getCategory({
-            _id: parsedFields.category,
-          });
+  let payload: ProductDoc;
+  const { image, fields } = await handleAssetUpload(
+    req,
+    `products/${_id}.jpg`,
+    {
+      fields: productValidation.createProduct,
+      file: customValidation.imageFileSchema,
+      requireFile: true,
+      callback: async (parsedFields) => {
+        const category = await categoryService.getCategory({
+          _id: parsedFields.category,
+        });
 
-          if (
-            !category.subcategories.find(
-              (each) => each._id == parsedFields.subcategory
-            )
-          ) {
-            throw new ApiError(
-              httpStatus.BAD_REQUEST,
-              `Selected subcategory does not belong to ${category.name}`
-            );
-          }
-        },
-      }
-    );
-    payload = { ...fields, image, _id };
-    const product = await Product.create(payload);
-    return product;
-  } catch (error: any) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      error.message || "Unable to create product",
-      false,
-      error.stack
-    );
-  }
+        if (
+          !category.subcategories.find(
+            (each) => each._id == parsedFields.subcategory
+          )
+        ) {
+          throw new ApiError(
+            httpStatus.BAD_REQUEST,
+            `Selected subcategory does not belong to ${category.name}`
+          );
+        }
+      },
+    }
+  );
+  payload = { ...fields, image, _id };
+  const product = await Product.create(payload);
+  return product;
 };
 const updateProduct = async (productId: string, req: Request) => {
-  try {
-    const { image, fields } = await handleAssetUpload(
-      req,
-      `products/${productId}.jpg`,
-      {
-        fields: productValidation.updateProduct,
-        file: customValidation.imageFileSchema,
-        requireFile: true,
-        callback: async (parsedFields) => {
-          const category = await categoryService.getCategory({
-            _id: parsedFields.category,
-          });
+  const { image, fields } = await handleAssetUpload(
+    req,
+    `products/${productId}.jpg`,
+    {
+      fields: productValidation.updateProduct,
+      file: customValidation.imageFileSchema,
+      requireFile: true,
+      callback: async (parsedFields) => {
+        const category = await categoryService.getCategory({
+          _id: parsedFields.category,
+        });
 
-          if (
-            !category.subcategories.find(
-              (each) => each._id == parsedFields.subcategory
-            )
-          ) {
-            throw new ApiError(
-              httpStatus.BAD_REQUEST,
-              `Selected subcategory does not belong to ${category.name}`
-            );
-          }
-        },
-      }
-    );
-
-    let payload: ProductDoc = { ...fields, image };
-
-    const product = await Product.findById(productId);
-    if (!product) throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
-
-    product.set(payload);
-
-    await product.save();
-
-    return product;
-  } catch (error: any) {
-    if (error instanceof ApiError) {
-      // re-throw known ApiErrors without wrapping
-      throw error;
+        if (
+          !category.subcategories.find(
+            (each) => each._id == parsedFields.subcategory
+          )
+        ) {
+          throw new ApiError(
+            httpStatus.BAD_REQUEST,
+            `Selected subcategory does not belong to ${category.name}`
+          );
+        }
+      },
     }
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      error.message || "Unable to update category",
-      false,
-      error.stack
-    );
-  }
+  );
+
+  let payload: ProductDoc = { ...fields, image };
+
+  const product = await Product.findById(productId);
+  if (!product) throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
+
+  product.set(payload);
+
+  await product.save();
+
+  return product;
 };
 
 const deleteProduct = async (id: string) => {
-  try {
-    const product = await Product.findById(id);
-    if (!product) throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
+  const product = await Product.findById(id);
+  if (!product) throw new ApiError(httpStatus.NOT_FOUND, "Product not found");
 
-    await product.deleteOne();
+  await product.deleteOne();
 
-    return "Product deleted successfully";
-  } catch (error: any) {
-    if (error instanceof ApiError) {
-      // re-throw known ApiErrors without wrapping
-      throw error;
-    }
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      error.message || "Unable to delete product",
-      false,
-      error.stack
-    );
-  }
+  return "Product deleted successfully";
 };
 
 export default {
