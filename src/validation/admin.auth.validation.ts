@@ -31,7 +31,24 @@ const loginWithCredentials = {
   }),
 };
 
+const resetPassword = {
+  body: z.object({
+    email: customValidation.email,
+  }),
+};
+
+const setNewPassword = {
+  body: z.object({
+    password: customValidation.required(z.string().min(6)),
+  }),
+  param: z.object({
+    token: customValidation.required(z.string(), "Token is required"),
+  }),
+};
+
 export default {
   createAccountWithCredentials,
   loginWithCredentials,
+  resetPassword,
+  setNewPassword,
 };

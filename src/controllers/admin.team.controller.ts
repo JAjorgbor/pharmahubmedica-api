@@ -10,6 +10,8 @@ import type { Request, Response } from "express";
 import config from "@/config/config.js";
 import { Types } from "mongoose";
 import moment from "moment";
+import Token from "@/models/token.model.js";
+import tokenTypes from "@/config/tokens.js";
 
 const getAdminUsers = catchAsync(async (req: Request, res: Response) => {
   const AdminUsers = await adminTeamService.getAdminUsers();
@@ -42,13 +44,14 @@ const adminUserInvite = catchAsync(async (req: Request, res: Response) => {
   }
 
   const { email, firstName } = req.body;
-  const token = await tokenService.generateAdminUserInviteToken({
-    ...req.body,
-  });
-  await adminUserService.createAdminUser({
+  const adminUser = await adminUserService.createAdminUser({
     ...req.body,
     status: "pending",
   });
+  const token = await tokenService.generateAdminUserInviteToken(
+    adminUser as any
+  );
+
   await emailService.AdminUserInvite({
     token,
     firstName,
@@ -66,8 +69,15 @@ const resendAdminUserInvite = catchAsync(
     if (!user) {
       throw new ApiError(404, "Admin user not found");
     }
+    if (user.status == "active") {
+      throw new ApiError(500, "Admin user already active");
+    }
 
-    const token = await tokenService.generateAdminUserInviteToken(user);
+    await Token.deleteMany({
+      user: user._id,
+      type: tokenTypes.INVITE_ADMIN_USER,
+    });
+    const token = await tokenService.generateAdminUserInviteToken(user as any);
     await emailService.AdminUserInvite({
       token,
       firstName: user.firstName,
@@ -86,12 +96,11 @@ const updateAdminUser = catchAsync(async (req: Request, res: Response) => {
 const acceptInvite = catchAsync(async (req: Request, res: Response) => {
   const token = req.params.token;
   const { password } = req.body;
-  const payload: any = await tokenService.getAdminUserPayloadFromToken(token!);
-  const user = await adminTeamService.updateAdminUserByEmail(payload.email!, {
-    password,
-    status: "active",
-  });
-  const tokens = await tokenService.generateAuthTokens(user, "Admin_User");
+
+  const { user, tokens } = await adminTeamService.acceptInvite(
+    token!,
+    password
+  );
 
   res.cookie("adminRefreshToken", tokens.refresh?.token!, {
     httpOnly: true,

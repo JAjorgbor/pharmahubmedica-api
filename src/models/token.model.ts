@@ -30,6 +30,7 @@ const tokenSchema = new mongoose.Schema(
         tokenTypes.VERIFY_EMAIL,
         tokenTypes.UPDATE_EMAIL,
         tokenTypes.VERIFY_OTP,
+        tokenTypes.INVITE_ADMIN_USER,
       ],
       required: true,
     },

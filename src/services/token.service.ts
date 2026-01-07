@@ -2,8 +2,11 @@ import jwt from "jsonwebtoken";
 import moment from "moment";
 import config from "@/config/config.js";
 import type { AdminUserDoc, AdminUserType } from "@/models/admin.user.model.js";
-import tokenTypes from "@/config/tokens.js";
+import tokenTypes, { type ITokenTypes } from "@/config/tokens.js";
 import Token from "@/models/token.model.js";
+import type { PortalUserType } from "@/models/portal.user.model.js";
+import ApiError from "@/utils/api-error.js";
+import httpStatus from "http-status";
 
 /**
  * Save a token
@@ -114,7 +117,11 @@ const generateAuthTokens = async (
  * @param {string} type
  * @returns {Promise<Token>}
  */
-const verifyToken = async (token: string, type: string, userModel: string) => {
+const verifyToken = async (
+  token: string,
+  type: ITokenTypes,
+  userModel: string
+) => {
   const payload = jwt.verify(token, config.jwt.secret);
   const tokenDoc = await Token.findOne({
     token,
@@ -124,7 +131,7 @@ const verifyToken = async (token: string, type: string, userModel: string) => {
     blacklisted: false,
   });
   if (!tokenDoc) {
-    throw new Error("Token not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "Token not found");
   }
   return tokenDoc;
 };
@@ -134,14 +141,56 @@ const verifyToken = async (token: string, type: string, userModel: string) => {
  * @param {object} payload (contains role, firstName, lastName, email)
  * @returns {Promise<string>}
  */
-const generateAdminUserInviteToken = async (payload: AdminUserType) => {
+const generateAdminUserInviteToken = async (payload: AdminUserDoc) => {
+  const expiresAt = moment().add(config.jwt.acceptInviteValidityDays, "days");
   const JWTPayload = {
     ...payload,
+    sub: payload._id.toString(),
     iat: moment().unix(),
-    exp: moment().add(config.jwt.acceptInviteValidityDays, "days").unix(),
+    exp: expiresAt.unix(),
     type: tokenTypes.INVITE_ADMIN_USER,
   };
-  return jwt.sign(JWTPayload, config.jwt.secret);
+  const inviteToken = jwt.sign(JWTPayload, config.jwt.secret);
+
+  await saveToken(
+    inviteToken,
+    { userModel: "Admin_User", _id: payload._id.toString() },
+    expiresAt,
+    tokenTypes.INVITE_ADMIN_USER
+  );
+
+  return inviteToken;
+};
+
+/**
+ * Generate reset password token
+ * @param {object} payload (contains userId, userModel)
+ * @returns {Promise<string>}
+ */
+const generateResetPasswordToken = async (payload: {
+  userId: string;
+  userModel: "Admin_User" | "Portal_User";
+}) => {
+  const resetPasswordTokenExpires = moment().add(
+    config.jwt.resetPasswordExpirationMinutes,
+    "minutes"
+  );
+  const JWTPayload = {
+    ...payload,
+    sub: payload.userId,
+    iat: moment().unix(),
+    exp: resetPasswordTokenExpires.unix(),
+    type: tokenTypes.RESET_PASSWORD,
+  };
+
+  const token = jwt.sign(JWTPayload, config.jwt.secret);
+  await saveToken(
+    token,
+    { userModel: payload.userModel, _id: payload.userId },
+    resetPasswordTokenExpires,
+    tokenTypes.RESET_PASSWORD
+  );
+  return token;
 };
 
 /**
@@ -149,7 +198,7 @@ const generateAdminUserInviteToken = async (payload: AdminUserType) => {
  * @param {string} token (token from accept invite)
  * @returns {Promise<object>} (containing role, firstName, lastName, email...)
  */
-const getAdminUserPayloadFromToken = async (token: string) => {
+const getPayloadFromToken = async (token: string) => {
   return jwt.verify(token, config.jwt.secret);
 };
 
@@ -159,5 +208,6 @@ export default {
   verifyToken,
   generateAuthTokens,
   generateAdminUserInviteToken,
-  getAdminUserPayloadFromToken,
+  getPayloadFromToken,
+  generateResetPasswordToken,
 };

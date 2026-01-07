@@ -2,6 +2,9 @@ import httpStatus from "http-status";
 import AdminUser, { type AdminUserType } from "@/models/admin.user.model.js";
 import AdminUserService from "@/services/admin.user.service.js";
 import ApiError from "@/utils/api-error.js";
+import tokenService from "@/services/token.service.js";
+import tokenTypes from "@/config/tokens.js";
+import Token from "@/models/token.model.js";
 
 /**
  * Get all admin team members
@@ -37,11 +40,8 @@ const updateAdminUserRole = async (id: string, role: string) => {
  * @param {string} body
  * @returns {Promise<Void>}
  */
-const updateAdminUserByEmail = async (
-  email: string,
-  body: Partial<AdminUserType>
-) => {
-  const adminUser = await AdminUser.findOne({ email });
+const updateAdminUser = async (id: string, body: Partial<AdminUserType>) => {
+  const adminUser = await AdminUser.findOne({ _id: id });
   if (!adminUser) {
     throw new ApiError(httpStatus.NOT_FOUND, "Admin User not found");
   }
@@ -64,10 +64,33 @@ const removeAdminUser = async (userId: string) => {
   return adminUser;
 };
 
+const acceptInvite = async (token: string, password: string) => {
+  const tokenDoc: any = await tokenService.verifyToken(
+    token!,
+    tokenTypes.INVITE_ADMIN_USER,
+    "Admin_User"
+  );
+
+  const user = await updateAdminUser(tokenDoc.user!, {
+    password,
+    status: "active",
+  });
+  if (!user) {
+    throw new ApiError(404, "Admin user not found");
+  }
+  const tokens = await tokenService.generateAuthTokens(user, "Admin_User");
+  await Token.deleteMany({
+    user: user._id,
+    type: tokenTypes.INVITE_ADMIN_USER,
+  });
+  return { user, tokens };
+};
+
 export default {
+  acceptInvite,
   getAdminUsers,
   updateAdminUserStatus,
-  updateAdminUserByEmail,
+  updateAdminUser,
   updateAdminUserRole,
   removeAdminUser,
 };

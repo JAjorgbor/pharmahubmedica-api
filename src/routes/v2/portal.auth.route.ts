@@ -16,6 +16,18 @@ router.post(
   validate(portalAuthValidation.login),
   portalAuthController.login
 );
+router.post(
+  "/reset-password",
+  validate(portalAuthValidation.resetPassword),
+  portalAuthController.resetPassword
+);
+
+router.post(
+  "/set-new-password/:token",
+  validate(portalAuthValidation.setNewPassword),
+  portalAuthController.setNewPassword
+);
+
 router.post("/logout", portalAuth(), portalAuthController.logout);
 router.post("/refresh-tokens", portalAuthController.refreshTokens);
 

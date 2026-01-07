@@ -18,5 +18,15 @@ router.post(
 );
 router.post("/logout", auth(), adminAuthController.logout);
 router.post("/refresh-tokens", adminAuthController.refreshTokens);
+router.post(
+  "/reset-password",
+  validate(adminAuthValidation.resetPassword),
+  adminAuthController.resetPassword
+);
+router.post(
+  "/set-new-password/:token",
+  validate(adminAuthValidation.setNewPassword),
+  adminAuthController.setNewPassword
+);
 
 export default router;

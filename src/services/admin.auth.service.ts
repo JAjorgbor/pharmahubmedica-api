@@ -1,11 +1,13 @@
 import tokenTypes from "@/config/tokens.js";
 import tokenService from "@/services/token.service.js";
 import ApiError from "@/utils/api-error.js";
+import Token from "@/models/token.model.js";
 import httpStatus from "http-status";
-import AdminUserService from "./admin.user.service.js";
+import adminUserService from "./admin.user.service.js";
+import emailService from "@/services/email.service.js";
 
 const loginWithCredentials = async (email: string, password: string) => {
-  const user = await AdminUserService.getAdminUser({ email });
+  const user = await adminUserService.getAdminUser({ email });
   if (!user || !(await (user as any).isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }
@@ -27,7 +29,7 @@ const refreshAuth = async (refreshToken: string) => {
       tokenTypes.REFRESH,
       "Admin_User"
     );
-    const user = await AdminUserService.getAdminUser({
+    const user = await adminUserService.getAdminUser({
       _id: String(refreshTokenDoc.user),
     });
     if (!user) {
@@ -48,8 +50,55 @@ const logout = async (refreshToken: string) => {
   await refreshTokenDoc.deleteOne();
 };
 
+const resetPassword = async (email: string) => {
+  const user = await adminUserService.getAdminUser({ email });
+  if (!user) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "The email provided does not exist!"
+    );
+  }
+
+  const token = await tokenService.generateResetPasswordToken({
+    userId: user._id.toString(),
+    userModel: "Admin_User",
+  });
+
+  await emailService.AdminResetPassword({
+    token,
+    firstName: user.firstName,
+    toEmail: email,
+  });
+  return true;
+};
+
+const setNewPassword = async (token: string, newPassword: string) => {
+  const tokenDoc: any = await tokenService.verifyToken(
+    token!,
+    tokenTypes.RESET_PASSWORD,
+    "Admin_User"
+  );
+
+  const user = await adminUserService.getAdminUser({ _id: tokenDoc.user });
+
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "The user does not exist!");
+  }
+  user.password = newPassword;
+
+  await user.save();
+
+  await Token.deleteMany({
+    user: user.id,
+    type: tokenTypes.RESET_PASSWORD,
+  });
+  return user;
+};
+
 export default {
   loginWithCredentials,
   refreshAuth,
   logout,
+  resetPassword,
+  setNewPassword,
 };

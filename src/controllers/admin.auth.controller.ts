@@ -58,9 +58,40 @@ const logout = catchAsync(async (req: Request, res: Response) => {
   res.send({ message: "Logged out" });
 });
 
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  await adminAuthService.resetPassword(req.body.email!);
+
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const setNewPassword = catchAsync(async (req: Request, res: Response) => {
+  const { token } = req.params;
+
+  const user = await adminAuthService.setNewPassword(
+    token!,
+    req.body.password!
+  );
+
+  const tokens = await tokenService.generateAuthTokens(user, "Admin_User");
+
+  res.cookie("adminRefreshToken", tokens.refresh?.token!, {
+    httpOnly: true,
+    secure: config.env === "production",
+    sameSite: config.env === "production" ? "strict" : "lax",
+    expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
+  });
+
+  res.status(httpStatus.OK).json({
+    user,
+    accessToken: tokens.access.token,
+  });
+});
+
 export default {
   createAccountWithCredentials,
   refreshTokens,
   loginWithCredentials,
   logout,
+  resetPassword,
+  setNewPassword,
 };

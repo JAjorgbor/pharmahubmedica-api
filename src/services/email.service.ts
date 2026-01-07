@@ -93,7 +93,49 @@ const AdminUserInvite = async ({
   });
 };
 
+const PortalResetPassword = async ({
+  toEmail,
+  firstName,
+  token,
+}: {
+  toEmail: string;
+  firstName: string;
+  token: string;
+}) => {
+  await sendEmailWithRetry({
+    toEmail,
+    subject: "Reset Portal Password",
+    templateId: 67060,
+    variables: {
+      firstName,
+      ctaLink: `${config.websiteUrl}/portal/set-new-password/${token}?firstName=${firstName}`,
+    },
+  });
+};
+
+const AdminResetPassword = async ({
+  toEmail,
+  firstName,
+  token,
+}: {
+  toEmail: string;
+  firstName: string;
+  token: string;
+}) => {
+  await sendEmailWithRetry({
+    toEmail,
+    subject: "Reset Admin Password",
+    templateId: 67060,
+    variables: {
+      firstName,
+      ctaLink: `${config.websiteUrl}/admin/set-new-password/${token}?firstName=${firstName}`,
+    },
+  });
+};
+
 export default {
   sendEmailWithRetry,
   AdminUserInvite,
+  PortalResetPassword,
+  AdminResetPassword,
 };

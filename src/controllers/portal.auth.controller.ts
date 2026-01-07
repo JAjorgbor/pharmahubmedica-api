@@ -1,7 +1,9 @@
 import config from "@/config/config.js";
+import emailService from "@/services/email.service.js";
 import portalAuthService from "@/services/portal.auth.service.js";
 import portalUserService from "@/services/portal.user.service.js";
 import tokenService from "@/services/token.service.js";
+import ApiError from "@/utils/api-error.js";
 import catchAsync from "@/utils/catch-async.js";
 import type { Request, Response } from "express";
 import httpStatus from "http-status";
@@ -55,9 +57,40 @@ const logout = catchAsync(async (req: Request, res: Response) => {
   res.send({ message: "Logged out" });
 });
 
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  await portalAuthService.resetPassword(req.body.email!);
+
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const setNewPassword = catchAsync(async (req: Request, res: Response) => {
+  const { token } = req.params;
+
+  const user = await portalAuthService.setNewPassword(
+    token!,
+    req.body.password!
+  );
+
+  const tokens = await tokenService.generateAuthTokens(user, "Portal_User");
+
+  res.cookie("portalRefreshToken", tokens.refresh?.token!, {
+    httpOnly: true,
+    secure: config.env === "production",
+    sameSite: config.env === "production" ? "strict" : "lax",
+    expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
+  });
+
+  res.status(httpStatus.OK).json({
+    user,
+    accessToken: tokens.access.token,
+  });
+});
+
 export default {
   createAccount,
   login,
   refreshTokens,
   logout,
+  resetPassword,
+  setNewPassword,
 };

@@ -101,6 +101,71 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /portal/auth/reset-password:
+    post:
+      tags:
+        - Portal Auth
+      summary: Send password reset email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        "204":
+          description: No Content
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /portal/auth/set-new-password/{token}:
+    post:
+      tags:
+        - Portal Auth
+      summary: Set a new password
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+          description: Password reset token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+      responses:
+        "200":
+          description: Password reset successful
+          headers:
+            Set-Cookie:
+              description: Refresh token cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortalAuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
 components:
   securitySchemes:
     bearerAuth:
