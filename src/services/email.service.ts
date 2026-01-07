@@ -108,7 +108,7 @@ const PortalResetPassword = async ({
     templateId: 67060,
     variables: {
       firstName,
-      ctaLink: `${config.websiteUrl}/portal/set-new-password/${token}?firstName=${firstName}`,
+      ctaLink: `${config.websiteUrl}/portal/reset-password?token=${token}&firstName=${firstName}`,
     },
   });
 };
@@ -128,7 +128,7 @@ const AdminResetPassword = async ({
     templateId: 67060,
     variables: {
       firstName,
-      ctaLink: `${config.websiteUrl}/admin/set-new-password/${token}?firstName=${firstName}`,
+      ctaLink: `${config.websiteUrl}/admin/reset-password?token=${token}&firstName=${firstName}`,
     },
   });
 };

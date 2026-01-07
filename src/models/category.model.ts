@@ -94,6 +94,14 @@ categorySchema.virtual("productsCount", {
   count: true, // <-- key: returns a number, not docs
 });
 
+categorySchema.virtual("visibleProductsCount", {
+  ref: "Product",
+  localField: "_id",
+  foreignField: "category",
+  count: true, // <-- key: returns a number, not docs
+  match: { visible: true }, // ✅ only count visible products
+});
+
 const Category = mongoose.model<CategoryType>("Category", categorySchema);
 
 export default Category;

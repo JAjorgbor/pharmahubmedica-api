@@ -43,7 +43,7 @@ const getVisibleCategories = async (pagination: PaginationResult) => {
   try {
     const categories = await Category.find({ visible: true })
       .populate("subcategories")
-      .populate("productsCount")
+      .populate("visibleProductsCount")
       .skip(skip)
       .limit(limit);
 
