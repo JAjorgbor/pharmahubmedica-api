@@ -1,5 +1,5 @@
 import { build } from "esbuild";
-import tsconfigPaths from "esbuild-plugin-tsconfig-paths";
+import { tsconfigPathsPlugin } from "esbuild-plugin-tsconfig-paths";
 
 await build({
   entryPoints: ["netlify/functions/api.ts"],
@@ -9,7 +9,7 @@ await build({
   format: "esm",
   bundle: true,
   sourcemap: true,
-  plugins: [tsconfigPaths()],
+  plugins: [tsconfigPathsPlugin()],
   external: [
     // Keep native deps external if needed (bcrypt can be tricky when bundled)
     "bcrypt",
