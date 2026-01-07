@@ -2,6 +2,7 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import config from "@/config/config.js";
 import tokenTypes from "@/config/tokens.js";
 import AdminUser from "@/models/admin.user.model.js";
+import PortalUser from "@/models/portal.user.model.js";
 import type { JwtPayload } from "jsonwebtoken";
 
 const jwtOptions = {
@@ -17,6 +18,11 @@ const jwtVerify = async (payload: JwtPayload, done: any) => {
     const adminUser = await AdminUser.findById(payload.sub);
     if (adminUser) {
       return done(null, adminUser);
+    }
+
+    const portalUser = await PortalUser.findById(payload.sub);
+    if (portalUser) {
+      return done(null, portalUser);
     }
 
     done(null, false);

@@ -1,4 +1,4 @@
-const userRoles = {
+const portalUserRoles = {
   manager: [],
   collaborator: [],
 };
@@ -55,25 +55,25 @@ const adminUserRoles = {
 } as const;
 
 const allRoles = {
-  ...userRoles,
+  ...portalUserRoles,
   ...adminUserRoles,
 };
 
 const roles = Object.keys(allRoles);
 const roleRights = new Map(Object.entries(allRoles));
 
-const userRoleOptions = Object.keys(userRoles);
+const userRoleOptions = Object.keys(portalUserRoles);
 const adminUserRoleOptions = Object.keys(adminUserRoles);
 
-const userPermissions = [...new Set(Object.values(userRoles).flat())];
+const userPermissions = [...new Set(Object.values(portalUserRoles).flat())];
 
 export type AdminUserPermissions =
   (typeof adminUserRoles)[keyof typeof adminUserRoles][number];
 export type UserPermissions =
-  (typeof userRoles)[keyof typeof userRoles][number];
+  (typeof portalUserRoles)[keyof typeof portalUserRoles][number];
 
 export default {
-  userRoles,
+  userRoles: portalUserRoles,
   adminUserRoles,
   roles,
   roleRights,

@@ -63,7 +63,7 @@ const generateToken = (
  */
 const generateAuthTokens = async (
   user: any,
-  userModel: "Admin_User" | "User",
+  userModel: "Admin_User" | "Portal_User",
   includeRefresh: boolean = true
 ) => {
   const accessTokenExpires = moment().add(
