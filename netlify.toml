@@ -11,6 +11,7 @@
 [functions]
   included_files = []
   node_bundler = "esbuild"
+  external_node_modules = ["express", "jsdom"]
 
 [functions."*"]
   ignored_files = ["**/*.d.ts", "**/*.d.ts.map"]
