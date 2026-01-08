@@ -7,3 +7,10 @@
   from = "/v2/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
+
+[functions]
+  included_files = []
+  node_bundler = "esbuild"
+
+[functions."*"]
+  ignored_files = ["**/*.d.ts", "**/*.d.ts.map"]
