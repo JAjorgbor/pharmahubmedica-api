@@ -9,9 +9,12 @@
   status = 200
 
 [functions]
-  included_files = []
   node_bundler = "esbuild"
   external_node_modules = ["jsdom"]
+  included_files = [
+    "node_modules/jsdom/lib/jsdom/browser/**",
+    "node_modules/.pnpm/jsdom@*/node_modules/jsdom/lib/jsdom/browser/**"
+  ]
 
 [functions."*"]
   ignored_files = ["**/*.d.ts", "**/*.d.ts.map"]
