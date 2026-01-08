@@ -2,7 +2,7 @@ import mongoose, {
   type HydratedDocument,
   type InferSchemaType,
 } from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import toJSON from "@/models/plugins/toJSON.plugin.js";
 import roles from "@/config/roles.js";
 import customValidation from "@/validation/custom.validation.js";
