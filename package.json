@@ -3,6 +3,11 @@
   "version": "2.0.0",
   "private": true,
   "packageManager": "pnpm@10.0.0",
+  "pnpm": {
+    "overrides": {
+      "html-encoding-sniffer": "4.0.0"
+    }
+  },
   "type": "module",
   "scripts": {
     "dev": "nodemon",
