@@ -16,7 +16,7 @@ const createAccount = catchAsync(async (req: Request, res: Response) => {
   res.cookie("portalRefreshToken", tokens.refresh?.token!, {
     httpOnly: true,
     secure: config.env === "production", // only in production
-    sameSite: "none",
+    sameSite: config.env === "production" ? "none" : "lax",
     expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
   });
 
@@ -34,7 +34,7 @@ const login = catchAsync(async (req: Request, res: Response) => {
   res.cookie("portalRefreshToken", tokens.refresh?.token!, {
     httpOnly: true,
     secure: config.env === "production", // only in production
-    sameSite: "none",
+    sameSite: config.env === "production" ? "none" : "lax",
     expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
   });
 
@@ -76,7 +76,7 @@ const setNewPassword = catchAsync(async (req: Request, res: Response) => {
   res.cookie("portalRefreshToken", tokens.refresh?.token!, {
     httpOnly: true,
     secure: config.env === "production", // only in production
-    sameSite: "none",
+    sameSite: config.env === "production" ? "none" : "lax",
     expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
   });
 

@@ -15,7 +15,7 @@ const createAccountWithCredentials = catchAsync(
     res.cookie("adminRefreshToken", tokens.refresh?.token!, {
       httpOnly: true,
       secure: config.env === "production", // only in production
-      sameSite: "none",
+      sameSite: config.env === "production" ? "none" : "lax",
       expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
     });
 
@@ -35,7 +35,7 @@ const loginWithCredentials = catchAsync(async (req: Request, res: Response) => {
   res.cookie("adminRefreshToken", tokens.refresh?.token!, {
     httpOnly: true,
     secure: config.env === "production", // only in production
-    sameSite: "none",
+    sameSite: config.env === "production" ? "none" : "lax",
     expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
   });
 
@@ -77,7 +77,7 @@ const setNewPassword = catchAsync(async (req: Request, res: Response) => {
   res.cookie("adminRefreshToken", tokens.refresh?.token!, {
     httpOnly: true,
     secure: config.env === "production",
-    sameSite: "none",
+    sameSite: config.env === "production" ? "none" : "lax",
     expires: moment().add(config.jwt.refreshExpirationDays, "days").toDate(),
   });
 
