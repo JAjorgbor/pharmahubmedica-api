@@ -1,11 +1,10 @@
+import toJSON from "@/models/plugins/toJSON.plugin.js";
+import customValidation from "@/validation/custom.validation.js";
+import bcrypt from "bcryptjs";
 import mongoose, {
   type HydratedDocument,
   type InferSchemaType,
 } from "mongoose";
-import bcrypt from "bcryptjs";
-import toJSON from "@/models/plugins/toJSON.plugin.js";
-import roles from "@/config/roles.js";
-import customValidation from "@/validation/custom.validation.js";
 
 const portalUserSchema = new mongoose.Schema(
   {
@@ -67,6 +66,7 @@ const portalUserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isReferralPartner: { type: Boolean, default: false },
     status: {
       type: String,
       default: "active",
