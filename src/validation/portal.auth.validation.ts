@@ -13,6 +13,7 @@ const createAccount = {
     ),
     password: customValidation.required(z.string().min(8)),
     dateOfBirth: z.string().optional(),
+    referralCode: z.string().optional(),
   }),
 };
 

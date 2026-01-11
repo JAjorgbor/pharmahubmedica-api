@@ -2,6 +2,7 @@ import PortalUser, {
   type PortalUserDoc,
   type PortalUserType,
 } from "@/models/portal.user.model.js";
+import ReferralPartner from "@/models/referral-partner.model.js";
 import ApiError from "@/utils/api-error.js";
 import httpStatus from "http-status";
 
@@ -11,9 +12,24 @@ const getPortalUser = async (
   return await PortalUser.findOne(filterParams);
 };
 
+const getPortalUsers = async (filterParams: any = {}) => {
+  return await PortalUser.find(filterParams);
+};
+
 const createPortalUser = async (userBody: any) => {
   if (await (PortalUser as any).isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+  }
+
+  // Handle referral code
+  if (userBody.referralCode) {
+    const partner = await ReferralPartner.findOne({
+      referralCode: userBody.referralCode,
+      status: "active",
+    });
+    if (partner) {
+      userBody.referredBy = partner._id;
+    }
   }
 
   // create security object
@@ -41,8 +57,19 @@ const updatePortalUser = async (userId: any, updateBody: any) => {
   return user;
 };
 
+const deletePortalUser = async (userId: string) => {
+  const user = await getPortalUser({ _id: userId });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Portal user not found");
+  }
+  await user.deleteOne();
+  return user;
+};
+
 export default {
   createPortalUser,
   updatePortalUser,
   getPortalUser,
+  getPortalUsers,
+  deletePortalUser,
 };

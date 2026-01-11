@@ -72,11 +72,17 @@ const portalUserSchema = new mongoose.Schema(
       default: "active",
       enum: ["pending", "active", "inactive", "waitlist"],
     },
-    referral: {
+    referredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Referral",
     },
 
+    deliveryAddresses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Delivery_Address",
+      },
+    ],
     // app: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "App",

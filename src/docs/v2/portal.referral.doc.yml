@@ -1,0 +1,106 @@
+openapi: 3.0.0
+info:
+  title: Portal Referral API
+  version: 1.0.0
+tags:
+  - name: Portal Referral
+    description: Referral features for logged-in portal users
+
+paths:
+  /portal/referrals/profile:
+    get:
+      tags:
+        - Portal Referral
+      summary: Get current user's referral profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralPartner"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Profile not found
+
+  /portal/referrals/referred-users:
+    get:
+      tags:
+        - Portal Referral
+      summary: Get list of users referred by the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReferredUser"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Bad Request
+    Forbidden:
+      description: Forbidden
+    Unauthorized:
+      description: Unauthorized
+    NotFound:
+      description: Not Found
+  schemas:
+    ReferredUser:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    ReferralPartner:
+      type: object
+      properties:
+        id:
+          type: string
+        user:
+          type: string
+        referralCode:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+        profession:
+          type: string
+        commission:
+          type: object
+          properties:
+            rate:
+              type: number
+            rateType:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time

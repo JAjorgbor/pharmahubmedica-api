@@ -52,7 +52,7 @@ const adminUserInvite = catchAsync(async (req: Request, res: Response) => {
     adminUser as any
   );
 
-  await emailService.AdminUserInvite({
+  await emailService.adminUserInvite({
     token,
     firstName,
     toEmail: email,
@@ -78,7 +78,7 @@ const resendAdminUserInvite = catchAsync(
       type: tokenTypes.INVITE_ADMIN_USER,
     });
     const token = await tokenService.generateAdminUserInviteToken(user as any);
-    await emailService.AdminUserInvite({
+    await emailService.adminUserInvite({
       token,
       firstName: user.firstName,
       toEmail: user.email!,

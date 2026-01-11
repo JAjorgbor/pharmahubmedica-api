@@ -64,7 +64,7 @@ const resetPassword = async (email: string) => {
     userModel: "Portal_User",
   });
 
-  await emailService.PortalResetPassword({
+  await emailService.portalResetPassword({
     token,
     firstName: user.firstName,
     toEmail: email,

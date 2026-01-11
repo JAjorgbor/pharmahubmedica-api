@@ -73,7 +73,7 @@ async function sendEmailWithRetry(emailData: EmailData, retries = 3) {
   }
 }
 
-const AdminUserInvite = async ({
+const adminUserInvite = async ({
   toEmail,
   firstName,
   token,
@@ -93,7 +93,7 @@ const AdminUserInvite = async ({
   });
 };
 
-const PortalResetPassword = async ({
+const portalResetPassword = async ({
   toEmail,
   firstName,
   token,
@@ -113,7 +113,7 @@ const PortalResetPassword = async ({
   });
 };
 
-const AdminResetPassword = async ({
+const adminResetPassword = async ({
   toEmail,
   firstName,
   token,
@@ -125,7 +125,7 @@ const AdminResetPassword = async ({
   await sendEmailWithRetry({
     toEmail,
     subject: "Reset Admin Password",
-    templateId: 67060,
+    templateId: 67528,
     variables: {
       firstName,
       ctaLink: `${config.websiteUrl}/admin/reset-password?token=${token}&firstName=${firstName}`,
@@ -133,9 +133,31 @@ const AdminResetPassword = async ({
   });
 };
 
+const notifyAddedReferralPartner = async ({
+  toEmail,
+  firstName,
+  professionalTitle,
+}: {
+  toEmail: string;
+  firstName: string;
+  professionalTitle: string;
+}) => {
+  await sendEmailWithRetry({
+    toEmail,
+    subject: "You've Been Enabled as a Referral Partner on PharmaHub Medica",
+    templateId: 67564,
+    variables: {
+      firstName,
+      professionalTitle,
+      ctaLink: `${config.websiteUrl}/portal/referrals`,
+    },
+  });
+};
+
 export default {
   sendEmailWithRetry,
-  AdminUserInvite,
-  PortalResetPassword,
-  AdminResetPassword,
+  adminUserInvite,
+  portalResetPassword,
+  adminResetPassword,
+  notifyAddedReferralPartner,
 };

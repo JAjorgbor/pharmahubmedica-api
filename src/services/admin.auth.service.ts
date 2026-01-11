@@ -64,7 +64,7 @@ const resetPassword = async (email: string) => {
     userModel: "Admin_User",
   });
 
-  await emailService.AdminResetPassword({
+  await emailService.adminResetPassword({
     token,
     firstName: user.firstName,
     toEmail: email,
