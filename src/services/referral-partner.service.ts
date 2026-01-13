@@ -10,7 +10,7 @@ const getReferralPartner = async (filterOptions: Object) => {
   const referralPartner = await ReferralPartner.findOne(filterOptions)
     .populate("user")
     // .populate("orders")
-    .populate("referrals");
+    .populate("referralsCount");
   return referralPartner;
 };
 
@@ -18,7 +18,7 @@ const getReferralPartners = async () => {
   const referralPartners = await ReferralPartner.find()
     .populate("user")
     // .populate("orders")
-    .populate("referrals");
+    .populate("referralsCount");
   return referralPartners;
 };
 

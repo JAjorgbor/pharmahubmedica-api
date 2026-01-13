@@ -7,7 +7,7 @@ import Token from "@/models/token.model.js";
 import emailService from "@/services/email.service.js";
 
 const loginWithCredentials = async (email: string, password: string) => {
-  const user = await portalUserService.getPortalUser({ email });
+  const user = await portalUserService.getPortalUser({ email }, true);
   if (!user || !(await (user as any).isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }

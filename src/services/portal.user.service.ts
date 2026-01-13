@@ -7,13 +7,22 @@ import ApiError from "@/utils/api-error.js";
 import httpStatus from "http-status";
 
 const getPortalUser = async (
-  filterParams: Partial<PortalUserType & { _id: string }>
+  filterParams: Partial<PortalUserType & { _id: string }>,
+  includePassword?: boolean
 ) => {
-  return await PortalUser.findOne(filterParams);
+  return await PortalUser.findOne(filterParams).select(
+    includePassword ? "+password" : ""
+  );
 };
 
 const getPortalUsers = async (filterParams: any = {}) => {
-  return await PortalUser.find(filterParams);
+  return await PortalUser.find(filterParams).populate({
+    path: "referredBy",
+    populate: {
+      path: "user",
+      select: "_id firstName lastName email",
+    },
+  });
 };
 
 const createPortalUser = async (userBody: any) => {

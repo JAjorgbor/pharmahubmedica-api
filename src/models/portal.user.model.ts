@@ -1,4 +1,3 @@
-import toJSON from "@/models/plugins/toJSON.plugin.js";
 import customValidation from "@/validation/custom.validation.js";
 import bcrypt from "bcryptjs";
 import mongoose, {
@@ -36,13 +35,13 @@ const portalUserSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: true,
-      unique: true,
     },
     dateOfBirth: {
       type: Date,
     },
     security: {
       password: {
+        select: false,
         type: String,
         trim: true,
         minlength: 8,
@@ -74,7 +73,7 @@ const portalUserSchema = new mongoose.Schema(
     },
     referredBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Referral",
+      ref: "Referral_Partner",
     },
 
     deliveryAddresses: [
@@ -92,9 +91,6 @@ const portalUserSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-// add plugin that converts mongoose to json
-portalUserSchema.plugin(toJSON);
 
 /**
  * Check if email is taken

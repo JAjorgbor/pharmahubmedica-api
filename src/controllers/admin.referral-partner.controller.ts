@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import catchAsync from "@/utils/catch-async.js";
 import referralPartnerService from "@/services/referral-partner.service.js";
 import type { Request, Response } from "express";
+import portalUserService from "@/services/portal.user.service.js";
 
 const getReferralPartners = catchAsync(async (req: Request, res: Response) => {
   const result = await referralPartnerService.getReferralPartners();
@@ -25,7 +26,7 @@ const addReferralPartner = catchAsync(async (req: Request, res: Response) => {
 const updateReferralPartner = catchAsync(
   async (req: Request, res: Response) => {
     const result = await referralPartnerService.updateReferralPartner({
-      _id: req.params.id,
+      _id: req.params.partnerId,
       ...req.body,
     });
     res.send({ partner: result });
@@ -34,7 +35,7 @@ const updateReferralPartner = catchAsync(
 
 const togglePartnerStatus = catchAsync(async (req: Request, res: Response) => {
   const result = await referralPartnerService.toggleReferralPartnerStatus(
-    req.params.id!
+    req.params.partnerId!
   );
   res.send({ partner: result });
 });
@@ -42,9 +43,18 @@ const togglePartnerStatus = catchAsync(async (req: Request, res: Response) => {
 const deleteReferralPartner = catchAsync(
   async (req: Request, res: Response) => {
     await referralPartnerService.deleteReferralPartner({
-      _id: req.params.id!,
+      _id: req.params.partnerId!,
     });
     res.status(httpStatus.NO_CONTENT).send();
+  }
+);
+
+const getReferralPartnerReferrals = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await portalUserService.getPortalUsers({
+      referredBy: req.params.partnerId,
+    });
+    res.send({ referrals: result });
   }
 );
 
@@ -55,4 +65,5 @@ export default {
   updateReferralPartner,
   togglePartnerStatus,
   deleteReferralPartner,
+  getReferralPartnerReferrals,
 };

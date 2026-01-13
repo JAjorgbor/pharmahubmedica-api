@@ -6,9 +6,12 @@ import ApiError from "@/utils/api-error.js";
 import httpStatus from "http-status";
 
 const getAdminUser = async (
-  filterParams: Partial<AdminUserType & { _id: string }>
+  filterParams: Partial<AdminUserType & { _id: string }>,
+  includePassword?: boolean
 ) => {
-  return await AdminUser.findOne(filterParams);
+  return await AdminUser.findOne(filterParams).select(
+    includePassword ? "+password" : ""
+  );
 };
 
 const createAdminUser = async (userBody: any) => {

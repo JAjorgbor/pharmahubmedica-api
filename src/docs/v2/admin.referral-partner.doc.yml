@@ -75,7 +75,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
-  /admin/referral-partners/{id}:
+  /admin/referral-partners/{partnerId}:
     patch:
       tags:
         - Admin Referral Partner
@@ -83,7 +83,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: id
+        - name: partnerId
           in: path
           required: true
           schema:
@@ -106,7 +106,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: id
+        - name: partnerId
           in: path
           required: true
           schema:
@@ -117,7 +117,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
-  /admin/referral-partners/toggle-status/{id}:
+  /admin/referral-partners/toggle-status/{partnerId}:
     patch:
       tags:
         - Admin Referral Partner
@@ -125,7 +125,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: id
+        - name: partnerId
           in: path
           required: true
           schema:
@@ -133,6 +133,34 @@ paths:
       responses:
         "200":
           description: OK
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /admin/referral-partners/referrals/{partnerId}:
+    get:
+      tags:
+        - Admin Referral Partner
+      summary: Get referral partner referrals
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: partnerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  referrals:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ReferralUser"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -177,6 +205,23 @@ components:
           type: string
           format: date-time
         updatedAt:
+          type: string
+          format: date-time
+
+    ReferralUser:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+        joinedAt:
           type: string
           format: date-time
 

@@ -19,7 +19,7 @@ router
   );
 
 router
-  .route("/:id")
+  .route("/:partnerId")
   .patch(
     auth("manageReferralPartners"),
     validate(adminReferralPartnerValidation.updateReferralPartner),
@@ -29,17 +29,22 @@ router
     auth("manageReferralPartners"),
     validate(adminReferralPartnerValidation.deleteReferralPartner),
     adminReferralPartnerController.deleteReferralPartner
+  )
+  .get(
+    auth("getReferralPartners"),
+    validate(adminReferralPartnerValidation.getReferralPartner),
+    adminReferralPartnerController.getReferralPartner
   );
 
 router.get(
-  "/detail/:partnerId",
+  "/referrals/:partnerId",
   auth("getReferralPartners"),
   validate(adminReferralPartnerValidation.getReferralPartner),
-  adminReferralPartnerController.getReferralPartner
+  adminReferralPartnerController.getReferralPartnerReferrals
 );
 
 router.patch(
-  "/toggle-status/:id",
+  "/toggle-status/:partnerId",
   auth("manageReferralPartners"),
   validate(adminReferralPartnerValidation.togglePartnerStatus),
   adminReferralPartnerController.togglePartnerStatus

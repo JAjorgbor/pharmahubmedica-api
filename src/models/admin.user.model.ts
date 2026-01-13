@@ -4,7 +4,6 @@ import mongoose, {
   type InferSchemaType,
 } from "mongoose";
 import bcrypt from "bcryptjs";
-import toJSON from "@/models/plugins/toJSON.plugin.js";
 import roles from "@/config/roles.js";
 
 const adminUserSchema = new mongoose.Schema({
@@ -34,6 +33,7 @@ const adminUserSchema = new mongoose.Schema({
   },
 
   password: {
+    select: false,
     type: String,
     // required: true,
     trim: true,
@@ -74,8 +74,6 @@ const adminUserSchema = new mongoose.Schema({
     type: String,
   },
 });
-
-adminUserSchema.plugin(toJSON);
 
 adminUserSchema.statics.isEmailTaken = async function (email, excludeUserId) {
   const user = await this.findOne({ email, _id: { $ne: excludeUserId } });

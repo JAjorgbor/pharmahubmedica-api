@@ -7,7 +7,7 @@ import adminUserService from "./admin.user.service.js";
 import emailService from "@/services/email.service.js";
 
 const loginWithCredentials = async (email: string, password: string) => {
-  const user = await adminUserService.getAdminUser({ email });
+  const user = await adminUserService.getAdminUser({ email }, true);
   if (!user || !(await (user as any).isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }

@@ -30,7 +30,7 @@ const addReferralPartner = {
 
 const updateReferralPartner = {
   params: z.object({
-    id: customValidation.required(z.string(), "Partner ID is required"),
+    partnerId: customValidation.required(z.string(), "Partner ID is required"),
   }),
   body: z.object({
     commissionRate: z.number().min(0).optional(),
@@ -49,13 +49,13 @@ const updateReferralPartner = {
 
 const togglePartnerStatus = {
   params: z.object({
-    id: customValidation.required(z.string(), "Partner ID is required"),
+    partnerId: customValidation.required(z.string(), "Partner ID is required"),
   }),
 };
 
 const deleteReferralPartner = {
   params: z.object({
-    id: customValidation.required(z.string(), "Partner ID is required"),
+    partnerId: customValidation.required(z.string(), "Partner ID is required"),
   }),
 };
 

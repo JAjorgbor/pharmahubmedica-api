@@ -3,7 +3,6 @@ import mongoose, {
   type HydratedDocument,
   type InferSchemaType,
 } from "mongoose";
-import toJSON from "@/models/plugins/toJSON.plugin.js";
 
 const tokenSchema = new mongoose.Schema(
   {
@@ -47,8 +46,6 @@ const tokenSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-tokenSchema.plugin(toJSON);
 
 export type Token = InferSchemaType<typeof tokenSchema>;
 export type TokenDoc = HydratedDocument<Token>;

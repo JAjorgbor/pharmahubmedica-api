@@ -53,14 +53,11 @@ const referralPartnerSchema = new mongoose.Schema(
 //   foreignField: "referralDetails.referralPartner",
 // });
 
-referralPartnerSchema.virtual("referrals", {
+referralPartnerSchema.virtual("referralsCount", {
   ref: "Portal_User",
   localField: "_id",
   foreignField: "referredBy",
-});
-
-referralPartnerSchema.virtual("referralsCount").get(function (this: any) {
-  return this.referrals ? this.referrals.length : 0;
+  count: true,
 });
 
 // referralPartnerSchema.virtual("commissionTotal").get(function (this: any) {
