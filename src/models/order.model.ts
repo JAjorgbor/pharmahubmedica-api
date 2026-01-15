@@ -1,4 +1,6 @@
 import { deliveryAddressSchema } from "@/models/delivery-address.model.js";
+import { deliveryMethodSchema } from "@/models/delivery-method.model.js";
+import moment from "moment";
 import mongoose, {
   type HydratedDocument,
   type InferSchemaType,
@@ -56,10 +58,6 @@ const orderSchema = new mongoose.Schema(
       deliveryFee: {
         type: Number,
       },
-      cartTotal: {
-        type: Number,
-        required: true,
-      },
       subTotal: {
         type: Number,
       },
@@ -67,21 +65,21 @@ const orderSchema = new mongoose.Schema(
         type: Number,
         required: true,
       },
-      paymentMethod: {
-        type: String,
-        required: true,
-        enum: [
-          "direct-bank-transfer",
-          "flutterwave",
-          "paystack",
-          "wallet-balance",
-        ],
-        default: "paystack",
-      },
+      // paymentMethod: {
+      //   type: String,
+      //   required: true,
+      //   enum: [
+      //     "direct-bank-transfer",
+      //     "flutterwave",
+      //     "paystack",
+      //     "wallet-balance",
+      //   ],
+      //   default: "paystack",
+      // },
     },
 
     deliveryAddress: deliveryAddressSchema,
-
+    deliveryMethod: deliveryMethodSchema,
     orderStatus: {
       type: String,
       enum: ["processing", "in-transit", "cancelled", "delivered"],
@@ -148,7 +146,40 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+orderSchema.pre("validate", async function () {
+  if (!this.orderNumber) {
+    let isUnique = false;
+    let attempts = 0;
+
+    while (!isUnique && attempts < 5) {
+      const datePart = moment().format("DDMMYY");
+      const randomPart = Math.random()
+        .toString(36)
+        .substring(2, 6)
+        .toUpperCase();
+      const generatedOrderNumber = `ORD-${datePart}-${randomPart}`;
+
+      const existingOrder = await mongoose.model("Order").findOne({
+        orderNumber: generatedOrderNumber,
+      });
+
+      if (!existingOrder) {
+        this.orderNumber = generatedOrderNumber;
+        isUnique = true;
+      }
+      attempts++;
+    }
+
+    if (!isUnique) {
+      throw new Error(
+        "Failed to generate a unique order number after multiple attempts."
+      );
+    }
+  }
+});
+
 export type OrderType = InferSchemaType<typeof orderSchema>;
 export type OrderDoc = HydratedDocument<OrderType>;
 
 const Order = mongoose.model("Order", orderSchema);
+export default Order;

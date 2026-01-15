@@ -11,7 +11,7 @@ const getPortalUser = async (
   includePassword?: boolean
 ) => {
   return await PortalUser.findOne(filterParams).select(
-    includePassword ? "+password" : ""
+    includePassword ? "+security.password" : ""
   );
 };
 

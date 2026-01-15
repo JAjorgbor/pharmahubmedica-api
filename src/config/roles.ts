@@ -18,6 +18,8 @@ const adminUserRoles = {
     "getReferralPartners",
     "manageReferralPartners",
     "manageCustomers",
+    "manageOrders",
+    "getOrders",
   ],
   administrator: [
     "getUsers",
@@ -32,6 +34,8 @@ const adminUserRoles = {
     "getReferralPartners",
     "manageReferralPartners",
     "manageCustomers",
+    "manageOrders",
+    "getOrders",
   ],
   operations: [
     "getUsers",
@@ -46,21 +50,26 @@ const adminUserRoles = {
     "getReferralPartners",
     "manageReferralPartners",
     "manageCustomers",
+    "manageOrders",
+    "getOrders",
   ],
   storeManager: [
     "getUsers",
     "getAdminUsers",
     "getInventory",
     "updateInventory",
+    "manageOrders",
+    "getOrders",
   ],
   marketingAndSales: [
     "getUsers",
     "getAdminUsers",
     "getInventory",
     "updateInventory",
+    "getOrders",
   ],
-  accountant: ["getUsers", "getAdminUsers", "getInventory"],
-  driver: ["getUsers", "getAdminUsers", "getInventory"],
+  accountant: ["getUsers", "getAdminUsers", "getInventory", "getOrders"],
+  driver: ["getUsers", "getAdminUsers", "getInventory", "getOrders"],
 } as const;
 
 const referralPartnerProfessions = {

@@ -28,7 +28,8 @@ const createAccountWithCredentials = catchAsync(
 const loginWithCredentials = catchAsync(async (req: Request, res: Response) => {
   const user = await adminAuthService.loginWithCredentials(
     req.body.email,
-    req.body.password
+    req.body.password,
+    req.cookies.adminRefreshToken
   );
 
   const tokens = await tokenService.generateAuthTokens(user, "Admin_User");

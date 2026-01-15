@@ -9,7 +9,12 @@ import categoryRoute from "@/routes/v2/category.route.js";
 import portalAuthRoute from "@/routes/v2/portal.auth.route.js";
 import adminReferralPartnerRoute from "@/routes/v2/admin.referral-partner.route.js";
 import portalReferralRoute from "@/routes/v2/portal.referral.route.js";
+import portalDeliveryAddressRoute from "@/routes/v2/portal.delivery-address.route.js";
+import portalOrderRoute from "@/routes/v2/portal.order.route.js";
+import portalUserRoute from "@/routes/v2/portal.user.route.js";
 import productRoute from "@/routes/v2/product.route.js";
+import adminDeliveryMethodRoute from "@/routes/v2/admin.delivery-method.route.js";
+import deliveryMethodRoute from "@/routes/v2/delivery-method.route.js";
 import testRoute from "@/routes/v2/test.js";
 import express, { Router } from "express";
 import swaggerUi from "swagger-ui-express";
@@ -30,12 +35,28 @@ const defaultRoutes = [
     route: categoryRoute,
   },
   {
+    path: "/delivery-methods",
+    route: deliveryMethodRoute,
+  },
+  {
     path: "/portal/auth",
     route: portalAuthRoute,
   },
   {
     path: "/portal/referrals",
     route: portalReferralRoute,
+  },
+  {
+    path: "/portal/delivery-address",
+    route: portalDeliveryAddressRoute,
+  },
+  {
+    path: "/portal/orders",
+    route: portalOrderRoute,
+  },
+  {
+    path: "/portal/users",
+    route: portalUserRoute,
   },
   // ADMIN ROUTES
   {
@@ -65,6 +86,10 @@ const defaultRoutes = [
   {
     path: "/admin/referral-partners",
     route: adminReferralPartnerRoute,
+  },
+  {
+    path: "/admin/delivery-methods",
+    route: adminDeliveryMethodRoute,
   },
 ];
 

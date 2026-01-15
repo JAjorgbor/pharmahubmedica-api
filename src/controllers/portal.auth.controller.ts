@@ -1,9 +1,7 @@
 import config from "@/config/config.js";
-import emailService from "@/services/email.service.js";
 import portalAuthService from "@/services/portal.auth.service.js";
 import portalUserService from "@/services/portal.user.service.js";
 import tokenService from "@/services/token.service.js";
-import ApiError from "@/utils/api-error.js";
 import catchAsync from "@/utils/catch-async.js";
 import type { Request, Response } from "express";
 import httpStatus from "http-status";
@@ -28,7 +26,11 @@ const createAccount = catchAsync(async (req: Request, res: Response) => {
 
 const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user = await portalAuthService.loginWithCredentials(email, password);
+  const user = await portalAuthService.loginWithCredentials(
+    email,
+    password,
+    req.cookies.portalRefreshToken
+  );
   const tokens = await tokenService.generateAuthTokens(user, "Portal_User");
 
   res.cookie("portalRefreshToken", tokens.refresh?.token!, {

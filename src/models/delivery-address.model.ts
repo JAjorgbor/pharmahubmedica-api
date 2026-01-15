@@ -35,3 +35,5 @@ const DeliveryAddress = mongoose.model(
   "Delivery_Address",
   deliveryAddressSchema
 );
+
+export default DeliveryAddress;

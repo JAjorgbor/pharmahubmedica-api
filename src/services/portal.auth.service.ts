@@ -6,13 +6,32 @@ import portalUserService from "@/services/portal.user.service.js";
 import Token from "@/models/token.model.js";
 import emailService from "@/services/email.service.js";
 
-const loginWithCredentials = async (email: string, password: string) => {
+const loginWithCredentials = async (
+  email: string,
+  password: string,
+  refreshToken?: string
+) => {
   const user = await portalUserService.getPortalUser({ email }, true);
   if (!user || !(await (user as any).isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }
   if (user.status !== "active") {
     throw new ApiError(httpStatus.FORBIDDEN, "Your account is not active");
+  }
+  if (refreshToken) {
+    try {
+      const payload = await tokenService.getPayloadFromToken(refreshToken);
+      const tokenDoc = await Token.findOne({
+        token: refreshToken,
+        type: tokenTypes.REFRESH,
+        user: payload.sub!,
+        userModel: "Portal_User",
+        blacklisted: false,
+      });
+      if (tokenDoc) await tokenDoc.deleteOne();
+    } catch {
+      return user;
+    }
   }
   return user;
 };
