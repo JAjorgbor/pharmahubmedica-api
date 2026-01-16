@@ -1,6 +1,6 @@
 import express from "express";
 import validate from "@/middlewares/validate.js";
-import orderValidation from "@/validation/order.validation.ts";
+import orderValidation from "@/validation/order.validation.js";
 import orderController from "@/controllers/admin.order.controller.js";
 import auth from "@/middlewares/admin-auth.js";
 
