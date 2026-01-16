@@ -1,5 +1,5 @@
 import adminAuthController from "@/controllers/admin.auth.controller.js";
-import auth from "@/middlewares/auth.js";
+import auth from "@/middlewares/admin-auth.js";
 import validate from "@/middlewares/validate.js";
 import adminAuthValidation from "@/validation/admin.auth.validation.js";
 import express, { Router } from "express";

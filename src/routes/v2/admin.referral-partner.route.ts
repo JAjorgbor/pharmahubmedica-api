@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import auth from "@/middlewares/auth.js";
+import auth from "@/middlewares/admin-auth.js";
 import validate from "@/middlewares/validate.js";
 import adminReferralPartnerController from "@/controllers/admin.referral-partner.controller.js";
 import adminReferralPartnerValidation from "@/validation/admin.referral-partner.validation.js";

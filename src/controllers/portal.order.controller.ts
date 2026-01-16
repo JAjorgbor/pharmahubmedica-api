@@ -22,20 +22,16 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getOrder = catchAsync(async (req: Request, res: Response) => {
-  const { userId, orderId } = req.params;
-  const user = req.user as any;
-
-  if (user._id.toString() !== userId) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Forbidden access to this order");
-  }
+  const { orderId } = req.params;
+  const user = req.portalUser;
+  const userId = user._id.toString();
 
   const order = await orderService.getOrder(orderId as string);
   if (!order) {
     throw new ApiError(httpStatus.NOT_FOUND, "Order not found");
   }
-
   // Ensure the order belongs to this user
-  if (order.customer.toString() !== userId) {
+  if (order.customer._id.toString() !== userId) {
     throw new ApiError(httpStatus.FORBIDDEN, "Forbidden access to this order");
   }
 
@@ -43,7 +39,7 @@ const getOrder = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getPortalUserOrders = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user as any;
+  const user = req.portalUser as any;
   // Use user id from auth instead of params if possible,
   // but if route doesn't have it, we use auth.
   // The route for this is / and it doesn't have :userId.

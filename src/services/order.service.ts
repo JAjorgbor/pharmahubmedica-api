@@ -87,7 +87,7 @@ const createOrder = async ({
     products: normalizedItems,
     deliveryAddress: deliveryAddressDetails,
     referralDetails,
-    transaction: { totalAmount, deliveryFee: 2000 },
+    transaction: { totalAmount, deliveryFee: deliveryMethodDetails.fee },
     deliveryMethod: deliveryMethodDetails,
   });
   return order;
@@ -99,13 +99,63 @@ const getPortalUserOrders = async (portalUserId: string) => {
   });
   if (!portalUser)
     throw new ApiError(httpStatus.NOT_FOUND, "Portal User not found");
-  const orders = await Order.find({ customer: portalUser._id.toString() });
+  const orders = await Order.find({ customer: portalUser._id.toString() })
+    .sort({ createdAt: -1 })
+    .populate("customer", "firstName lastName email phoneNumber");
   return orders;
 };
 
-const getOrder = async (orderId: string) => {
+const queryOrders = async (
+  filter: Record<string, any>,
+  options: Record<string, any>
+) => {
+  const orders = await Order.find(filter)
+    .sort(options.sortBy || { createdAt: -1 })
+    .skip(options.page ? (options.page - 1) * options.limit : 0)
+    .limit(options.limit || 10)
+    .populate("customer", "firstName lastName email phoneNumber");
+  return orders;
+};
+
+const updateOrder = async (
+  orderId: string,
+  updateBody: Record<string, any>
+) => {
   const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Order not found");
+  }
+
+  // Update audit timestamps based on status change
+  if (updateBody.orderStatus) {
+    const now = new Date();
+    if (updateBody.orderStatus === "processing")
+      order.orderAudit!.processedAt = now;
+    if (updateBody.orderStatus === "in-transit")
+      order.orderAudit!.inTransitAt = now;
+    if (updateBody.orderStatus === "cancelled")
+      order.orderAudit!.cancelledAt = now;
+    if (updateBody.orderStatus === "delivered")
+      order.orderAudit!.deliveredAt = now;
+  }
+
+  Object.assign(order, updateBody);
+  await order.save();
   return order;
 };
 
-export default { createOrder, getPortalUserOrders, getOrder };
+const getOrder = async (orderId: string) => {
+  const order = await Order.findById(orderId).populate(
+    "customer",
+    "firstName lastName email phoneNumber"
+  );
+  return order;
+};
+
+export default {
+  createOrder,
+  getPortalUserOrders,
+  getOrder,
+  queryOrders,
+  updateOrder,
+};

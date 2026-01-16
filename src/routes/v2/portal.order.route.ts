@@ -20,7 +20,7 @@ router
   );
 
 router
-  .route("/:userId/:orderId")
+  .route("/:orderId")
   .get(
     portalAuth(),
     validate(orderValidation.getOrder),

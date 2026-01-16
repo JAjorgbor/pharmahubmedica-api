@@ -11,6 +11,7 @@ import adminReferralPartnerRoute from "@/routes/v2/admin.referral-partner.route.
 import portalReferralRoute from "@/routes/v2/portal.referral.route.js";
 import portalDeliveryAddressRoute from "@/routes/v2/portal.delivery-address.route.js";
 import portalOrderRoute from "@/routes/v2/portal.order.route.js";
+import adminOrderRoute from "@/routes/v2/admin.order.route.js";
 import portalUserRoute from "@/routes/v2/portal.user.route.js";
 import productRoute from "@/routes/v2/product.route.js";
 import adminDeliveryMethodRoute from "@/routes/v2/admin.delivery-method.route.js";
@@ -90,6 +91,10 @@ const defaultRoutes = [
   {
     path: "/admin/delivery-methods",
     route: adminDeliveryMethodRoute,
+  },
+  {
+    path: "/admin/orders",
+    route: adminOrderRoute,
   },
 ];
 

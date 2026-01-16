@@ -10,8 +10,29 @@ const getOrders = {
 
 const getOrder = {
   params: z.object({
-    userId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid User ID"),
     orderId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Order ID"),
+  }),
+};
+
+const adminGetOrder = {
+  params: z.object({
+    orderId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Order ID"),
+  }),
+};
+
+const updateOrder = {
+  params: z.object({
+    orderId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Order ID"),
+  }),
+  body: z.object({
+    orderStatus: z
+      .enum(["processing", "in-transit", "cancelled", "delivered"])
+      .optional(),
+    paymentStatus: z
+      .enum(["pending", "paid", "failed", "abandoned", "reversed"])
+      .optional(),
+    trackingId: z.string().optional(),
+    note: z.string().optional(),
   }),
 };
 
@@ -38,5 +59,7 @@ const createOrder = {
 export default {
   getOrders,
   getOrder,
+  adminGetOrder,
+  updateOrder,
   createOrder,
 };

@@ -1,5 +1,5 @@
 import express from "express";
-import auth from "@/middlewares/auth.js";
+import auth from "@/middlewares/admin-auth.js";
 import validate from "@/middlewares/validate.js";
 import deliveryMethodValidation from "@/validation/delivery-method.validation.js";
 import deliveryMethodController from "@/controllers/delivery-method.controller.js";

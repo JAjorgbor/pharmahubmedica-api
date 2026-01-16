@@ -19,7 +19,7 @@ const verifyCallback =
         new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate")
       );
     }
-    req.user = user;
+    req.adminUser = user;
     const adminUser = await AdminUser.findById(user._id);
 
     // If user is not an admin user

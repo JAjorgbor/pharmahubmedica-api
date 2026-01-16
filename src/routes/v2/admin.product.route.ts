@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import adminProductController from "@/controllers/admin.product.controller.js";
-import auth from "@/middlewares/auth.js";
+import auth from "@/middlewares/admin-auth.js";
 
 const router: Router = express.Router();
 

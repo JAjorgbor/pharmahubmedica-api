@@ -18,7 +18,7 @@ const verifyCallback =
         new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate")
       );
     }
-    req.user = user;
+    req.portalUser = user;
     const portalUser = await PortalUser.findById(user._id);
 
     // If user is not a portal user

@@ -1,6 +1,6 @@
 import adminTeamController from "@/controllers/admin.team.controller.js";
 import express, { Router } from "express";
-import auth from "@/middlewares/auth.js";
+import auth from "@/middlewares/admin-auth.js";
 import validate from "@/middlewares/validate.js";
 import adminTeamValidation from "@/validation/admin.team.validation.js";
 
