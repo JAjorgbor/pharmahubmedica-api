@@ -1,7 +1,7 @@
 import customValidation from "@/validation/custom.validation.js";
 import z from "zod";
 
-const createCategory = {
+const createCategory = z.object({
   name: customValidation.required(z.string(), "Category name is required"),
   description: customValidation.required(z.string(), "Description is required"),
   visible: customValidation.required(z.boolean(), "Visible is required"),
@@ -16,9 +16,9 @@ const createCategory = {
     ),
     "Subcategories are required"
   ),
-};
+});
 
-const updateCategory = {
+const updateCategory = z.object({
   name: customValidation.required(z.string(), "Category name is required"),
   description: customValidation.required(z.string(), "Description is required"),
   visible: customValidation.required(z.boolean(), "Visible is required"),
@@ -34,7 +34,7 @@ const updateCategory = {
     ),
     "Subcategories are required"
   ),
-};
+});
 
 export default {
   createCategory,
