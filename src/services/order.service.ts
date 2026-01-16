@@ -61,6 +61,7 @@ const createOrder = async ({
     );
     return {
       productId: thisProduct?._id,
+      productImage: thisProduct?.image,
       quantity: item.quantity,
       price: thisProduct?.price,
       amount: thisProduct!.price * item.quantity,

@@ -23,8 +23,16 @@ const orderSchema = new mongoose.Schema(
         // dynamic ref to reference multiple different mongoose models
         productId: {
           type: mongoose.Schema.Types.ObjectId,
-          refPath: "Product",
+          ref: "Product",
           required: true,
+        },
+        productImage: {
+          url: {
+            type: String,
+          },
+          key: {
+            type: String,
+          },
         },
         productName: {
           type: String,
