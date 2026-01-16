@@ -101,7 +101,14 @@ const getPortalUserOrders = async (portalUserId: string) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Portal User not found");
   const orders = await Order.find({ customer: portalUser._id.toString() })
     .sort({ createdAt: -1 })
-    .populate("customer", "firstName lastName email phoneNumber");
+    .populate("customer", "firstName lastName email phoneNumber")
+    .populate({
+      path: "referralDetails.referralPartner",
+      populate: {
+        path: "user",
+        select: "_id firstName lastName email phoneNumber",
+      },
+    });
   return orders;
 };
 
@@ -113,7 +120,14 @@ const queryOrders = async (
     .sort(options.sortBy || { createdAt: -1 })
     .skip(options.page ? (options.page - 1) * options.limit : 0)
     .limit(options.limit || 10)
-    .populate("customer", "firstName lastName email phoneNumber");
+    .populate("customer", "firstName lastName email phoneNumber")
+    .populate({
+      path: "referralDetails.referralPartner",
+      populate: {
+        path: "user",
+        select: "_id firstName lastName email phoneNumber",
+      },
+    });
   return orders;
 };
 
