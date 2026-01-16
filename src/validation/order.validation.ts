@@ -56,10 +56,29 @@ const createOrder = {
   }),
 };
 
+const updateOrderProducts = {
+  params: z.object({
+    orderId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Order ID"),
+  }),
+  body: z.object({
+    products: z
+      .array(
+        z.object({
+          productId: z
+            .string()
+            .regex(/^[0-9a-fA-F]{24}$/, "Invalid Product ID"),
+          quantity: z.number().int().min(1),
+        })
+      )
+      .min(1),
+  }),
+};
+
 export default {
   getOrders,
   getOrder,
   adminGetOrder,
   updateOrder,
   createOrder,
+  updateOrderProducts,
 };

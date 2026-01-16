@@ -167,10 +167,73 @@ const getOrder = async (orderId: string) => {
   return order;
 };
 
+const updateOrderProducts = async (
+  orderId: string,
+  products: { productId: string; quantity: number }[]
+) => {
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Order not found");
+  }
+
+  // Only allow product updates for processing orders
+  if (order.orderStatus !== "processing") {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Products can only be updated for orders in processing status"
+    );
+  }
+
+  // Fetch all products
+  const fetchedProducts = await Product.find({
+    _id: { $in: products.map((item) => item.productId) },
+  });
+
+  if (fetchedProducts.length !== products.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Some products not found");
+  }
+
+  // Calculate new total
+  const subTotal = products.reduce(
+    (total, item) =>
+      total +
+      fetchedProducts.find(
+        (product) => product._id.toString() === item.productId
+      )!.price *
+        item.quantity,
+    0
+  );
+
+  // Normalize products
+  const normalizedProducts = products.map((item) => {
+    const thisProduct = fetchedProducts.find(
+      (product) => product._id.toString() === item.productId
+    );
+    return {
+      productId: thisProduct?._id,
+      productImage: thisProduct?.image,
+      quantity: item.quantity,
+      price: thisProduct?.price,
+      amount: thisProduct!.price * item.quantity,
+      productName: thisProduct?.name,
+    };
+  });
+
+  // Update order
+  order.products = normalizedProducts as any;
+  order.transaction!.subTotal = subTotal;
+  order.transaction!.totalAmount =
+    subTotal + (order.transaction!.deliveryFee || 0);
+
+  await order.save();
+  return order;
+};
+
 export default {
   createOrder,
   getPortalUserOrders,
   getOrder,
   queryOrders,
   updateOrder,
+  updateOrderProducts,
 };

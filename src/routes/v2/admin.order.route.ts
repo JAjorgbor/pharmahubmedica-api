@@ -27,4 +27,12 @@ router
     orderController.updateOrderStatus
   );
 
+router
+  .route("/:orderId/products")
+  .patch(
+    auth("manageOrders"),
+    validate(orderValidation.updateOrderProducts),
+    orderController.updateOrderProducts
+  );
+
 export default router;
