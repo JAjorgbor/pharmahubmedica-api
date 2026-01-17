@@ -29,7 +29,7 @@ const createOrder = async ({
   const deliveryAddressDetails =
     await deliveryAddressService.getDeliveryAddressById(
       portalUser._id.toString(),
-      deliveryAddress
+      deliveryAddress,
     );
   if (!deliveryAddressDetails)
     throw new ApiError(httpStatus.NOT_FOUND, "Delivery Address not found");
@@ -50,14 +50,14 @@ const createOrder = async ({
     (total, item) =>
       total +
       fetchedProducts.find(
-        (product) => product._id.toString() === item.productId
+        (product) => product._id.toString() === item.productId,
       )!.price *
         item.quantity,
-    0
+    0,
   );
   const normalizedItems = items.map((item) => {
     const thisProduct = fetchedProducts.find(
-      (product) => product._id.toString() === item.productId
+      (product) => product._id.toString() === item.productId,
     );
     return {
       productId: thisProduct?._id,
@@ -115,7 +115,7 @@ const getPortalUserOrders = async (portalUserId: string) => {
 
 const queryOrders = async (
   filter: Record<string, any>,
-  options: Record<string, any>
+  options: Record<string, any>,
 ) => {
   const orders = await Order.find(filter)
     .sort(options.sortBy || { createdAt: -1 })
@@ -134,7 +134,7 @@ const queryOrders = async (
 
 const updateOrder = async (
   orderId: string,
-  updateBody: Record<string, any>
+  updateBody: Record<string, any>,
 ) => {
   const order = await Order.findById(orderId);
   if (!order) {
@@ -154,22 +154,46 @@ const updateOrder = async (
       order.orderAudit!.deliveredAt = now;
   }
 
-  Object.assign(order, updateBody);
+  // Update referral commission status and note if provided
+  if (updateBody.referralCommissionStatus && order.referralDetails) {
+    order.referralDetails.commission!.status =
+      updateBody.referralCommissionStatus;
+  }
+  if (
+    updateBody.referralCommissionNote !== undefined &&
+    order.referralDetails
+  ) {
+    order.referralDetails.commission!.note = updateBody.referralCommissionNote;
+  }
+
+  // Remove commission fields from updateBody to avoid overwriting
+  const {
+    referralCommissionStatus,
+    referralCommissionNote,
+    ...restUpdateBody
+  } = updateBody;
+
+  Object.assign(order, restUpdateBody);
   await order.save();
   return order;
 };
 
 const getOrder = async (orderId: string) => {
-  const order = await Order.findById(orderId).populate(
-    "customer",
-    "firstName lastName email phoneNumber"
-  );
+  const order = await Order.findById(orderId)
+    .populate("customer", "firstName lastName email phoneNumber")
+    .populate({
+      path: "referralDetails.referralPartner",
+      populate: {
+        path: "user",
+        select: "_id firstName lastName email phoneNumber",
+      },
+    });
   return order;
 };
 
 const updateOrderProducts = async (
   orderId: string,
-  products: { productId: string; quantity: number }[]
+  products: { productId: string; quantity: number }[],
 ) => {
   const order = await Order.findById(orderId);
   if (!order) {
@@ -180,7 +204,7 @@ const updateOrderProducts = async (
   if (order.orderStatus !== "processing") {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Products can only be updated for orders in processing status"
+      "Products can only be updated for orders in processing status",
     );
   }
 
@@ -198,16 +222,16 @@ const updateOrderProducts = async (
     (total, item) =>
       total +
       fetchedProducts.find(
-        (product) => product._id.toString() === item.productId
+        (product) => product._id.toString() === item.productId,
       )!.price *
         item.quantity,
-    0
+    0,
   );
 
   // Normalize products
   const normalizedProducts = products.map((item) => {
     const thisProduct = fetchedProducts.find(
-      (product) => product._id.toString() === item.productId
+      (product) => product._id.toString() === item.productId,
     );
     return {
       productId: thisProduct?._id,
@@ -224,6 +248,21 @@ const updateOrderProducts = async (
   order.transaction!.subTotal = subTotal;
   order.transaction!.totalAmount =
     subTotal + (order.transaction!.deliveryFee || 0);
+
+  // Update referral commission if applicable
+  if (order.referralDetails?.referralPartner) {
+    const referralPartner = await referralPartnerService.getReferralPartner({
+      _id: order.referralDetails.referralPartner,
+    });
+
+    if (referralPartner) {
+      const commissionRate = referralPartner.commission!.rate;
+      const newCommissionAmount =
+        order.transaction!.totalAmount * (commissionRate / 100);
+
+      order.referralDetails.commission!.amount = newCommissionAmount;
+    }
+  }
 
   await order.save();
   return order;

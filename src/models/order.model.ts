@@ -143,7 +143,8 @@ const orderSchema = new mongoose.Schema(
         },
         status: {
           type: String,
-          enum: ["paid", "pending", "canceled"],
+          enum: ["paid", "pending", "cancelled"],
+          default: "pending",
         },
         note: {
           type: String,
@@ -151,7 +152,7 @@ const orderSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 orderSchema.pre("validate", async function () {
@@ -180,7 +181,7 @@ orderSchema.pre("validate", async function () {
 
     if (!isUnique) {
       throw new Error(
-        "Failed to generate a unique order number after multiple attempts."
+        "Failed to generate a unique order number after multiple attempts.",
       );
     }
   }

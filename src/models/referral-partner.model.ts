@@ -47,11 +47,11 @@ const referralPartnerSchema = new mongoose.Schema(
   }
 );
 
-// referralPartnerSchema.virtual("orders", {
-//   ref: "Order",
-//   localField: "_id",
-//   foreignField: "referralDetails.referralPartner",
-// });
+referralPartnerSchema.virtual("orders", {
+  ref: "Order",
+  localField: "_id",
+  foreignField: "referralDetails.referralPartner",
+});
 
 referralPartnerSchema.virtual("referralsCount", {
   ref: "Portal_User",
@@ -60,32 +60,32 @@ referralPartnerSchema.virtual("referralsCount", {
   count: true,
 });
 
-// referralPartnerSchema.virtual("commissionTotal").get(function (this: any) {
-//   if (!this.orders) return 0;
-//   return this.orders.reduce((total: number, order: any) => {
-//     return total + (order.referralDetails?.commission?.amount || 0);
-//   }, 0);
-// });
+referralPartnerSchema.virtual("commissionTotal").get(function (this: any) {
+  if (!this.orders) return 0;
+  return this.orders.reduce((total: number, order: any) => {
+    return total + (order.referralDetails?.commission?.amount || 0);
+  }, 0);
+});
 
-// referralPartnerSchema.virtual("pendingCommissions").get(function (this: any) {
-//   if (!this.orders) return 0;
-//   return this.orders.reduce((total: number, order: any) => {
-//     if (order.referralDetails?.commission?.status === "pending") {
-//       return total + (order.referralDetails?.commission?.amount || 0);
-//     }
-//     return total;
-//   }, 0);
-// });
+referralPartnerSchema.virtual("pendingCommissions").get(function (this: any) {
+  if (!this.orders) return 0;
+  return this.orders.reduce((total: number, order: any) => {
+    if (order.referralDetails?.commission?.status === "pending") {
+      return total + (order.referralDetails?.commission?.amount || 0);
+    }
+    return total;
+  }, 0);
+});
 
-// referralPartnerSchema.virtual("paidCommissions").get(function (this: any) {
-//   if (!this.orders) return 0;
-//   return this.orders.reduce((total: number, order: any) => {
-//     if (order.referralDetails?.commission?.status === "paid") {
-//       return total + (order.referralDetails?.commission?.amount || 0);
-//     }
-//     return total;
-//   }, 0);
-// });
+referralPartnerSchema.virtual("paidCommissions").get(function (this: any) {
+  if (!this.orders) return 0;
+  return this.orders.reduce((total: number, order: any) => {
+    if (order.referralDetails?.commission?.status === "paid") {
+      return total + (order.referralDetails?.commission?.amount || 0);
+    }
+    return total;
+  }, 0);
+});
 
 referralPartnerSchema.pre("validate", async function () {
   if (!this.referralCode) {

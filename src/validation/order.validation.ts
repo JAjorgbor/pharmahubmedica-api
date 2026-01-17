@@ -33,6 +33,10 @@ const updateOrder = {
       .optional(),
     trackingId: z.string().optional(),
     note: z.string().optional(),
+    referralCommissionStatus: z
+      .enum(["pending", "paid", "cancelled"])
+      .optional(),
+    referralCommissionNote: z.string().optional(),
   }),
 };
 
@@ -46,7 +50,7 @@ const createOrder = {
             .string()
             .regex(/^[0-9a-fA-F]{24}$/, "Invalid Product ID"),
           quantity: z.number().int().min(1),
-        })
+        }),
       )
       .min(1),
     deliveryAddress: z
@@ -68,7 +72,7 @@ const updateOrderProducts = {
             .string()
             .regex(/^[0-9a-fA-F]{24}$/, "Invalid Product ID"),
           quantity: z.number().int().min(1),
-        })
+        }),
       )
       .min(1),
   }),

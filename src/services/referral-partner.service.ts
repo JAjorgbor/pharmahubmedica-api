@@ -9,7 +9,7 @@ import roles from "@/config/roles.js";
 const getReferralPartner = async (filterOptions: Object) => {
   const referralPartner = await ReferralPartner.findOne(filterOptions)
     .populate("user")
-    // .populate("orders")
+    .populate("orders")
     .populate("referralsCount");
   return referralPartner;
 };
@@ -17,7 +17,7 @@ const getReferralPartner = async (filterOptions: Object) => {
 const getReferralPartners = async () => {
   const referralPartners = await ReferralPartner.find()
     .populate("user")
-    // .populate("orders")
+    .populate("orders")
     .populate("referralsCount");
   return referralPartners;
 };
