@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import ReferralPartner from "@/models/referral-partner.model.js";
 import PortalUser from "@/models/portal.user.model.js";
 import portalUserService from "@/services/portal.user.service.js";
@@ -11,6 +12,8 @@ const getReferralPartner = async (filterOptions: Object) => {
     .populate("user")
     .populate("orders")
     .populate("referralsCount");
+  if (!referralPartner)
+    throw new ApiError(httpStatus.NOT_FOUND, "Referral Partner not found");
   return referralPartner;
 };
 
@@ -143,6 +146,96 @@ const getReferredUsers = async (partnerId: string) => {
   return await PortalUser.find({ referredBy: partnerId });
 };
 
+const getReferralsSummary = async (partnerId: string) => {
+  const partnerObjectId = new mongoose.Types.ObjectId(partnerId);
+  return await PortalUser.aggregate([
+    { $match: { referredBy: partnerObjectId } },
+    {
+      $lookup: {
+        from: "orders",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$customer", "$$userId"] },
+                  {
+                    $eq: ["$referralDetails.referralPartner", partnerObjectId],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: "orders",
+      },
+    },
+    {
+      $addFields: {
+        orderCount: { $size: "$orders" },
+        commissionStatus: {
+          $cond: {
+            if: { $gt: [{ $size: "$orders" }, 0] },
+            then: {
+              $cond: {
+                if: {
+                  $anyElementTrue: {
+                    $map: {
+                      input: "$orders",
+                      as: "o",
+                      in: {
+                        $eq: [
+                          "$$o.referralDetails.commission.status",
+                          "pending",
+                        ],
+                      },
+                    },
+                  },
+                },
+                then: "pending",
+                else: {
+                  $cond: {
+                    if: {
+                      $anyElementTrue: {
+                        $map: {
+                          input: "$orders",
+                          as: "o",
+                          in: {
+                            $eq: [
+                              "$$o.referralDetails.commission.status",
+                              "paid",
+                            ],
+                          },
+                        },
+                      },
+                    },
+                    then: "paid",
+                    else: "cancelled",
+                  },
+                },
+              },
+            },
+            else: "none",
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        firstName: 1,
+        lastName: 1,
+        email: 1,
+        phoneNumber: 1,
+        status: 1,
+        createdAt: 1,
+        orderCount: 1,
+        commissionStatus: 1,
+      },
+    },
+  ]);
+};
+
 export default {
   getReferralPartner,
   getReferralPartners,
@@ -151,4 +244,5 @@ export default {
   toggleReferralPartnerStatus,
   deleteReferralPartner,
   getReferredUsers,
+  getReferralsSummary,
 };

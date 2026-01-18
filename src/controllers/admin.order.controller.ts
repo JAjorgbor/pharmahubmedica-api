@@ -6,10 +6,14 @@ import { type Request, type Response } from "express";
 import ApiError from "@/utils/api-error.js";
 
 const getOrders = catchAsync(async (req: Request, res: Response) => {
-  const filter = pick(req.query, ["orderStatus", "paymentStatus", "customer"]);
+  const filter = pick(req.query, [
+    "orderStatus",
+    "paymentStatus",
+    "customer",
+    "referralPartner",
+  ]);
   const options = pick(req.query, ["sortBy", "limit", "page"]);
-  // Query for orders with pagination if service supports it,
-  // but let's check order service again.
+
   const orders = await orderService.queryOrders(filter, options);
   res.status(httpStatus.OK).json({ success: true, orders });
 });
@@ -34,7 +38,7 @@ const updateOrderProducts = catchAsync(async (req: Request, res: Response) => {
   const { products } = req.body;
   const order = await orderService.updateOrderProducts(
     orderId as string,
-    products
+    products,
   );
   res.status(httpStatus.OK).json({ success: true, order });
 });

@@ -3,8 +3,16 @@ import { z } from "zod";
 const getOrders = {
   query: z.object({
     sortBy: z.string().optional(),
-    limit: z.number().int().optional(),
-    page: z.number().int().optional(),
+    limit: z.coerce.number().int().optional(),
+    page: z.coerce.number().int().optional(),
+    orderStatus: z
+      .enum(["processing", "in-transit", "cancelled", "delivered"])
+      .optional(),
+    paymentStatus: z
+      .enum(["pending", "paid", "failed", "abandoned", "reversed"])
+      .optional(),
+    customer: z.string().optional(),
+    referralPartner: z.string().optional(),
   }),
 };
 

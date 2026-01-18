@@ -40,16 +40,22 @@ const updateReferralPartnerDetails = catchAsync(
 
 const getReferrals = catchAsync(async (req: Request, res: Response) => {
   const userId = req.portalUser._id.toString();
-  const result = await portalUserService.getPortalUsers({
-    referredBy: userId,
+  const partner = await referralPartnerService.getReferralPartner({
+    user: userId,
   });
+  if (!partner) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Referral partner not found");
+  }
+  const result = await referralPartnerService.getReferralsSummary(
+    partner._id.toString(),
+  );
   res.status(httpStatus.OK).json({ referrals: result });
 });
 
 const getReferredUserOrders = catchAsync(
   async (req: Request, res: Response) => {
-    const userId = req.portalUser._id.toString();
-    const result = await orderService.getPortalUserOrders(userId);
+    const userId = req.params.userId;
+    const result = await orderService.getPortalUserOrders(userId!);
     res.status(httpStatus.OK).json({ orders: result });
   },
 );
