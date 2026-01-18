@@ -36,4 +36,10 @@ router.get(
   portalReferralPartnerController.getReferredUserOrders,
 );
 
+router.get(
+  "/referrals/:userId/orders/:orderId",
+  portalAuth("referralPartner"),
+  portalReferralPartnerController.getReferredUserOrder,
+);
+
 export default router;

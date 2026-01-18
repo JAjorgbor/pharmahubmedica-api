@@ -60,6 +60,34 @@ const getReferredUserOrders = catchAsync(
   },
 );
 
+const getReferredUserOrder = catchAsync(async (req: Request, res: Response) => {
+  const requestingUser = req.portalUser;
+  const partner = await referralPartnerService.getReferralPartner({
+    user: requestingUser._id.toString(),
+  });
+  if (!partner) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Referral partner not found");
+  }
+  const userId = req.params.userId;
+  const orderId = req.params.orderId;
+  const portalUser = await portalUserService.getPortalUser({ _id: userId! });
+  if (!portalUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  if (portalUser.referredBy?.toString() !== partner._id.toString()) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "You are not authorized to view this order",
+    );
+  }
+  const order = await orderService.getOrder(orderId as string);
+  if (!order) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Order not found");
+  }
+
+  res.status(httpStatus.OK).json({ order });
+});
+
 const getReferredUserDetails = catchAsync(
   async (req: Request, res: Response) => {
     const userId = req.params.userId;
@@ -75,4 +103,5 @@ export default {
   getReferrals,
   getReferredUserOrders,
   getReferredUserDetails,
+  getReferredUserOrder,
 };

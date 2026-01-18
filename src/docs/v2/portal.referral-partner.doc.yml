@@ -134,6 +134,41 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /portal/referral-partners/referrals/{userId}/orders/{orderId}:
+    get:
+      tags:
+        - Portal Referral Partner
+      summary: Get a specific order of a referred user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 components:
   securitySchemes:
     bearerAuth:
