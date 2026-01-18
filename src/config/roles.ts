@@ -82,7 +82,7 @@ const referralPartnerProfessions = {
 } as const;
 
 const normalizedReferralPartnerProfessions = Object.keys(
-  referralPartnerProfessions
+  referralPartnerProfessions,
 );
 
 const allRoles = {

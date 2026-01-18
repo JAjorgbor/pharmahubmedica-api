@@ -8,7 +8,7 @@ import adminUserRoute from "@/routes/v2/admin.user.route.js";
 import categoryRoute from "@/routes/v2/category.route.js";
 import portalAuthRoute from "@/routes/v2/portal.auth.route.js";
 import adminReferralPartnerRoute from "@/routes/v2/admin.referral-partner.route.js";
-import portalReferralRoute from "@/routes/v2/portal.referral.route.js";
+import portalReferralPartnerRoute from "@/routes/v2/portal.referral-partner.route.js";
 import portalDeliveryAddressRoute from "@/routes/v2/portal.delivery-address.route.js";
 import portalOrderRoute from "@/routes/v2/portal.order.route.js";
 import adminOrderRoute from "@/routes/v2/admin.order.route.js";
@@ -44,8 +44,8 @@ const defaultRoutes = [
     route: portalAuthRoute,
   },
   {
-    path: "/portal/referrals",
-    route: portalReferralRoute,
+    path: "/portal/referral-partners",
+    route: portalReferralPartnerRoute,
   },
   {
     path: "/portal/delivery-address",
@@ -101,7 +101,7 @@ const defaultRoutes = [
 defaultRoutes.forEach((route) => router.use(route.path, route.route));
 
 router.use("/docs", swaggerUi.serve, (req: any, res: any, next: any) =>
-  swaggerUi.setup(createSwaggerSpec())(req, res, next)
+  swaggerUi.setup(createSwaggerSpec())(req, res, next),
 );
 
 export default router;

@@ -44,19 +44,12 @@ tags:
     description: Portal user management for admins
 
 paths:
-  /portal/users/{id}:
+  /portal/users/me:
     get:
-      summary: Get portal user by ID
+      summary: Get logged in portal user details
       tags: [Portal User]
       security:
         - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: Portal User ID
       responses:
         "200":
           description: OK

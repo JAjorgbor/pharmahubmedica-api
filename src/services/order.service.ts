@@ -73,6 +73,7 @@ const createOrder = async ({
   if (referralPartner) {
     referralDetails = {
       referralPartner: referralPartner?._id,
+      accountDetails: referralPartner.accountDetails,
       commission: {
         rate: referralPartner?.commission!.rate,
         rateType: referralPartner?.commission!.rateType,

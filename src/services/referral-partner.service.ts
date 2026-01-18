@@ -26,10 +26,17 @@ const addReferralPartner = async ({
   user,
   commissionRate,
   profession,
+  accountDetails,
 }: {
   user: string;
   commissionRate: number;
   profession: string;
+  accountDetails: {
+    accountName: string;
+    bankName: string;
+    accountNumber: string;
+    bankCode: string;
+  };
 }) => {
   const portalUser = await portalUserService.getPortalUser({ _id: user });
   if (!portalUser)
@@ -38,14 +45,15 @@ const addReferralPartner = async ({
   if (portalUser.isReferralPartner) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "User is already a referral partner"
+      "User is already a referral partner",
     );
   }
 
-  const referralPartner = ReferralPartner.create({
+  const referralPartner = await ReferralPartner.create({
     user,
     commission: { rate: commissionRate },
     profession,
+    accountDetails,
   });
   portalUser.isReferralPartner = true;
   await portalUser.save();
@@ -64,6 +72,7 @@ const updateReferralPartner = async ({
   _id,
   commissionRate,
   profession,
+  accountDetails,
 }: {
   _id: string;
   commissionRate?: number;
@@ -74,6 +83,12 @@ const updateReferralPartner = async ({
     | "chemist"
     | "lab technician"
     | "other";
+  accountDetails?: {
+    accountName?: string;
+    bankName?: string;
+    accountNumber?: string;
+    bankCode?: string;
+  };
 }) => {
   const referralPartner = await ReferralPartner.findOne({
     _id,
@@ -84,6 +99,12 @@ const updateReferralPartner = async ({
 
   if (commissionRate) referralPartner.commission!.rate = commissionRate;
   if (profession) referralPartner.profession = profession;
+  if (accountDetails) {
+    referralPartner.accountDetails = {
+      ...referralPartner.accountDetails,
+      ...accountDetails,
+    };
+  }
 
   return referralPartner.save();
 };

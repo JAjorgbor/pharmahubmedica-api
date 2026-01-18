@@ -130,6 +130,20 @@ const orderSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Referral_Partner",
       },
+      accountDetails: {
+        accountName: {
+          type: String,
+        },
+        bankName: {
+          type: String,
+        },
+        accountNumber: {
+          type: String,
+        },
+        bankCode: {
+          type: String,
+        },
+      },
       commission: {
         rate: {
           type: Number,

@@ -12,7 +12,7 @@ const addReferralPartner = {
     user: customValidation.required(z.string(), "User ID is required"),
     commissionRate: customValidation.required(
       z.number().min(0),
-      "Commission rate is required"
+      "Commission rate is required",
     ),
     profession: customValidation.required(
       z.enum([
@@ -23,8 +23,20 @@ const addReferralPartner = {
         "lab technician",
         "other",
       ]),
-      "Profession is required"
+      "Profession is required",
     ),
+    accountDetails: z.object({
+      accountName: customValidation.required(
+        z.string(),
+        "Account name is required",
+      ),
+      bankName: customValidation.required(z.string(), "Bank name is required"),
+      accountNumber: customValidation.required(
+        z.string(),
+        "Account number is required",
+      ),
+      bankCode: customValidation.required(z.string(), "Bank code is required"),
+    }),
   }),
 };
 
@@ -43,6 +55,26 @@ const updateReferralPartner = {
         "lab technician",
         "other",
       ])
+      .optional(),
+    accountDetails: z
+      .object({
+        accountName: customValidation.required(
+          z.string(),
+          "Account name is required",
+        ),
+        bankName: customValidation.required(
+          z.string(),
+          "Bank name is required",
+        ),
+        accountNumber: customValidation.required(
+          z.string(),
+          "Account number is required",
+        ),
+        bankCode: customValidation.required(
+          z.string(),
+          "Bank code is required",
+        ),
+      })
       .optional(),
   }),
 };

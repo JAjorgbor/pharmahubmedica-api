@@ -201,6 +201,8 @@ components:
               type: number
             rateType:
               type: string
+        accountDetails:
+          $ref: "#/components/schemas/AccountDetails"
         createdAt:
           type: string
           format: date-time
@@ -239,6 +241,8 @@ components:
         profession:
           type: string
           enum: [doctor, nurse, pharmacist, chemist, lab technician, other]
+        accountDetails:
+          $ref: "#/components/schemas/AccountDetails"
 
     UpdateReferralPartnerInput:
       type: object
@@ -248,3 +252,22 @@ components:
         profession:
           type: string
           enum: [doctor, nurse, pharmacist, chemist, lab technician, other]
+        accountDetails:
+          $ref: "#/components/schemas/AccountDetails"
+
+    AccountDetails:
+      type: object
+      required:
+        - bankName
+        - bankCode
+        - accountNumber
+        - accountName
+      properties:
+        bankName:
+          type: string
+        bankCode:
+          type: string
+        accountNumber:
+          type: string
+        accountName:
+          type: string

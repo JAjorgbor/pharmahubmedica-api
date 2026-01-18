@@ -5,8 +5,8 @@ import catchAsync from "@/utils/catch-async.js";
 import type { Request, Response } from "express";
 
 const getPortalUser = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const portalUser = await portalUserService.getPortalUser({ _id: id! });
+  const userId = req.portalUser._id.toString();
+  const portalUser = await portalUserService.getPortalUser({ _id: userId });
 
   if (!portalUser)
     throw new ApiError(httpStatus.NOT_FOUND, "Portal user not found");

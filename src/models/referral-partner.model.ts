@@ -39,12 +39,26 @@ const referralPartnerSchema = new mongoose.Schema(
         default: "percentage",
       },
     },
+    accountDetails: {
+      accountName: {
+        type: String,
+      },
+      bankName: {
+        type: String,
+      },
+      accountNumber: {
+        type: String,
+      },
+      bankCode: {
+        type: String,
+      },
+    },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 referralPartnerSchema.virtual("orders", {
@@ -113,7 +127,7 @@ export type ReferralPartnerDoc = HydratedDocument<ReferralPartnerType>;
 
 const ReferralPartner = mongoose.model(
   "Referral_Partner",
-  referralPartnerSchema
+  referralPartnerSchema,
 );
 
 export default ReferralPartner;
