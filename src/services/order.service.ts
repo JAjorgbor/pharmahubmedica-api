@@ -118,7 +118,14 @@ const queryOrders = async (
   filter: Record<string, any>,
   options: Record<string, any>,
 ) => {
-  const orders = await Order.find(filter)
+  const finalFilter = { ...filter };
+  if (finalFilter.referralPartner) {
+    finalFilter["referralDetails.referralPartner"] =
+      finalFilter.referralPartner;
+    delete finalFilter.referralPartner;
+  }
+
+  const orders = await Order.find(finalFilter)
     .sort(options.sortBy || { createdAt: -1 })
     .skip(options.page ? (options.page - 1) * options.limit : 0)
     .limit(options.limit || 10)
