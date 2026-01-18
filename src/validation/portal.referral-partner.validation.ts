@@ -2,9 +2,6 @@ import { z } from "zod";
 import customValidation from "@/validation/custom.validation.js";
 
 const updateReferralPartner = {
-  params: z.object({
-    partnerId: customValidation.required(z.string(), "Partner ID is required"),
-  }),
   body: z.object({
     commissionRate: z.number().min(0).optional(),
     profession: z
