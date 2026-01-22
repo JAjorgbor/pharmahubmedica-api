@@ -7,4 +7,10 @@ const router: Router = express.Router();
 
 router.get("/me", portalAuth(), portalUserController.getPortalUser);
 
+router.patch(
+  "/password",
+  portalAuth(),
+  portalUserController.updatePortalUserPassword,
+);
+
 export default router;
