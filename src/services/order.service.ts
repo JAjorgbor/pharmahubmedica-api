@@ -22,9 +22,12 @@ const createOrder = async ({
   if (!portalUser)
     throw new ApiError(httpStatus.NOT_FOUND, "Portal User not found");
 
-  const referralPartner = await referralPartnerService.getReferralPartner({
-    _id: portalUser.referredBy,
-  });
+  let referralPartner = undefined;
+  if (portalUser.referredBy) {
+    referralPartner = await referralPartnerService.getReferralPartner({
+      _id: portalUser.referredBy,
+    });
+  }
 
   const deliveryAddressDetails =
     await deliveryAddressService.getDeliveryAddressById(
@@ -69,7 +72,7 @@ const createOrder = async ({
     };
   });
 
-  let referralDetails = {};
+  let referralDetails: any = undefined;
   if (referralPartner) {
     referralDetails = {
       referralPartner: referralPartner?._id,
