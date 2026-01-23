@@ -13,4 +13,18 @@ const getAdminUser = catchAsync(async (req: Request, res: Response) => {
   res.status(200).json(adminUser);
 });
 
-export default { getAdminUser };
+const updateAdminUserPassword = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { oldPassword, newPassword } = req.body;
+
+    const passwordUpdate = await adminUserService.updateAdminUserPassword(
+      id,
+      oldPassword,
+      newPassword,
+    );
+    res.status(200).json(passwordUpdate);
+  },
+);
+
+export default { getAdminUser, updateAdminUserPassword };

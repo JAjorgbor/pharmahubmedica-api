@@ -7,10 +7,10 @@ import httpStatus from "http-status";
 
 const getAdminUser = async (
   filterParams: Partial<AdminUserType & { _id: string }>,
-  includePassword?: boolean
+  includePassword?: boolean,
 ) => {
   return await AdminUser.findOne(filterParams).select(
-    includePassword ? "+password" : ""
+    includePassword ? "+password" : "",
   );
 };
 
@@ -44,8 +44,26 @@ const updateAdminUser = async (userId: any, updateBody: any) => {
   return user;
 };
 
+const updateAdminUserPassword = async (
+  userId: any,
+  oldPassword: any,
+  newPassword: any,
+) => {
+  const user = await getAdminUser({ _id: userId }, true);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Admin User not found");
+  }
+  if (!user || !(await (user as any).isPasswordMatch(oldPassword))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Old password is incorrect");
+  }
+  user.password = newPassword;
+  await user.save();
+  return user;
+};
+
 export default {
   createAdminUser,
   updateAdminUser,
   getAdminUser,
+  updateAdminUserPassword,
 };
