@@ -8,18 +8,18 @@ const createAccountWithCredentials = {
     lastName: customValidation.required(z.string(), "Last name is required"),
     status: customValidation.required(
       z.enum(["active", "inactive"]),
-      "Status is required"
+      "Status is required",
     ),
     role: customValidation.required(
       z.enum(roles.adminUserRoleOptions),
-      "Role is required"
+      "Role is required",
     ),
     gender: customValidation.required(
       z.enum(["Male", "Female"]),
-      "Gender is required"
+      "Gender is required",
     ),
     email: customValidation.email,
-    password: customValidation.required(z.string().min(8)),
+    password: customValidation.required(z.string().min(6)),
     phoneNumber: z.string().optional(),
   }),
 };

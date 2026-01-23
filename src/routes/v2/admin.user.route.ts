@@ -10,7 +10,14 @@ router.get(
   "/:id",
   auth("getAdminUsers"),
   validate(adminUserValidation.getAdminUser),
-  adminUserController.getAdminUser
+  adminUserController.getAdminUser,
+);
+
+router.patch(
+  "/id",
+  auth("updateAdminUserPassword"),
+  validate(adminUserValidation.updateAdminUserPassword),
+  adminUserController.updateAdminUserPassword,
 );
 
 export default router;
