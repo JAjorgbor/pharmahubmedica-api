@@ -13,7 +13,7 @@ import ApiError from "@/utils/api-error.js";
  */
 const createDeliveryAddress = async (
   userId: string,
-  addressBody: Partial<DeliveryAddressType>
+  addressBody: Partial<DeliveryAddressType>,
 ) => {
   const address = await DeliveryAddress.create(addressBody);
   await PortalUser.findByIdAndUpdate(userId, {
@@ -51,7 +51,7 @@ const getDeliveryAddressById = async (userId: string, addressId: string) => {
   // Note: user.deliveryAddresses contains ObjectIds if not populated, or docs if populated.
   // We assume here we need to verify ownership.
   const hasAddress = user.deliveryAddresses.some(
-    (id) => id.toString() === addressId
+    (id) => id.toString() === addressId,
   );
 
   if (!hasAddress) {
@@ -75,7 +75,7 @@ const getDeliveryAddressById = async (userId: string, addressId: string) => {
 const updateDeliveryAddress = async (
   userId: string,
   addressId: string,
-  updateBody: Partial<DeliveryAddressType>
+  updateBody: Partial<DeliveryAddressType>,
 ) => {
   const address = await getDeliveryAddressById(userId, addressId);
   Object.assign(address, updateBody);

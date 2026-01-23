@@ -8,10 +8,10 @@ import httpStatus from "http-status";
 
 const getPortalUser = async (
   filterParams: Partial<PortalUserType & { _id: string }>,
-  includePassword?: boolean
+  includePassword?: boolean,
 ) => {
   return await PortalUser.findOne(filterParams).select(
-    includePassword ? "+security.password" : ""
+    includePassword ? "+security.password" : "",
   );
 };
 
@@ -75,10 +75,33 @@ const deletePortalUser = async (userId: string) => {
   return user;
 };
 
+const updatePortalUserPassword = async (
+  userId: string,
+  {
+    currentPassword,
+    newPassword,
+  }: { currentPassword: string; newPassword: string },
+) => {
+  const user = await getPortalUser({ _id: userId });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Portal user not found");
+  }
+  const isCurrentPasswordCorrect = await (user as any).isPasswordMatch(
+    currentPassword,
+  );
+  if (!isCurrentPasswordCorrect)
+    throw new ApiError(httpStatus.BAD_REQUEST, "Current password is incorrect");
+
+  user.security!.password = newPassword;
+
+  return user;
+};
+
 export default {
   createPortalUser,
   updatePortalUser,
   getPortalUser,
   getPortalUsers,
   deletePortalUser,
+  updatePortalUserPassword,
 };
