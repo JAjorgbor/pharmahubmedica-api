@@ -101,6 +101,20 @@ portalUserSchema.virtual("orderCount", {
   count: true,
 });
 
+portalUserSchema.virtual("paidOrders", {
+  ref: "Order",
+  localField: "_id",
+  foreignField: "customer",
+  match: { paymentStatus: "paid" },
+});
+
+portalUserSchema.virtual("totalSpent").get(function (this: any) {
+  if (!this.paidOrders) return 0;
+  return this.paidOrders.reduce((total: number, order: any) => {
+    return total + (order.transaction?.totalAmount || 0);
+  }, 0);
+});
+
 /**
  * Check if email is taken
  * @param {string} email - The user's email

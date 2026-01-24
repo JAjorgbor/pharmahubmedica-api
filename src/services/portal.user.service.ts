@@ -12,7 +12,11 @@ const getPortalUser = async (
 ) => {
   return await PortalUser.findOne(filterParams)
     .select(includePassword ? "+security.password" : "")
-    .populate("orderCount");
+    .populate("orderCount")
+    .populate({
+      path: "paidOrders",
+      select: "transaction.totalAmount",
+    });
 };
 
 const getPortalUsers = async (filterParams: any = {}) => {
@@ -24,7 +28,11 @@ const getPortalUsers = async (filterParams: any = {}) => {
         select: "_id firstName lastName email",
       },
     })
-    .populate("orderCount");
+    .populate("orderCount")
+    .populate({
+      path: "paidOrders",
+      select: "transaction.totalAmount",
+    });
 };
 
 const createPortalUser = async (userBody: any) => {
