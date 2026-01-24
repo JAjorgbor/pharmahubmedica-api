@@ -49,7 +49,7 @@ const createOrder = async ({
   if (fetchedProducts.length !== items.length) {
     throw new ApiError(httpStatus.NOT_FOUND, "Some products not found");
   }
-  const totalAmount = items.reduce(
+  const subTotal = items.reduce(
     (total, item) =>
       total +
       fetchedProducts.find(
@@ -58,6 +58,8 @@ const createOrder = async ({
         item.quantity,
     0,
   );
+
+  const totalAmount = subTotal + (deliveryMethodDetails.fee || 0);
   const normalizedItems = items.map((item) => {
     const thisProduct = fetchedProducts.find(
       (product) => product._id.toString() === item.productId,
@@ -92,7 +94,11 @@ const createOrder = async ({
     products: normalizedItems,
     deliveryAddress: deliveryAddressDetails,
     referralDetails,
-    transaction: { totalAmount, deliveryFee: deliveryMethodDetails.fee },
+    transaction: {
+      subTotal,
+      totalAmount,
+      deliveryFee: deliveryMethodDetails.fee,
+    },
     deliveryMethod: deliveryMethodDetails,
   });
   return order;

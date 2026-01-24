@@ -8,13 +8,10 @@ const getAdminUser = {
 };
 
 const updateAdminUserPassword = {
-  params: z.object({
-    id: customValidation.required(z.string(), "Admin user ID is required"),
-  }),
   body: z.object({
-    oldPassword: customValidation.required(
+    currentPassword: customValidation.required(
       z.string(),
-      "Old password is required",
+      "Current password is required",
     ),
     newPassword: customValidation.required(
       z.string().min(6),

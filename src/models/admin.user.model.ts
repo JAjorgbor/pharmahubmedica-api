@@ -5,8 +5,19 @@ import mongoose, {
 } from "mongoose";
 import bcrypt from "bcryptjs";
 import roles from "@/config/roles.js";
+import r2 from "@/config/r2-client.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import config from "@/config/config.js";
 
 const adminUserSchema = new mongoose.Schema({
+  avatar: {
+    url: {
+      type: String,
+    },
+    key: {
+      type: String,
+    },
+  },
   firstName: {
     type: String,
     required: true,
@@ -41,7 +52,7 @@ const adminUserSchema = new mongoose.Schema({
     validate(value: string) {
       if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
         throw new Error(
-          "Password must contain at least one letter and one number"
+          "Password must contain at least one letter and one number",
         );
       }
     },
@@ -91,6 +102,20 @@ adminUserSchema.pre("save", async function (next) {
     adminUser.password = await bcrypt.hash(adminUser.password, 8);
   }
 });
+
+adminUserSchema.pre(
+  "deleteOne",
+  { document: true },
+  async function (this: AdminUserDoc) {
+    if (!this.avatar?.key) return;
+    await r2.send(
+      new DeleteObjectCommand({
+        Bucket: config.r2.bucket!,
+        Key: this.avatar.key,
+      }),
+    );
+  },
+);
 
 export type AdminUserType = InferSchemaType<typeof adminUserSchema>;
 export type AdminUserDoc = HydratedDocument<AdminUserType>;

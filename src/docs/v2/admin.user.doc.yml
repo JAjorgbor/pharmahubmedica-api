@@ -35,6 +35,43 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /admin/users/me/password:
+    patch:
+      tags:
+        - Admin User
+      summary: Update admin user password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  description: Current password
+                newPassword:
+                  type: string
+                  description: New password (min 6 chars)
+      responses:
+        "200":
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 components:
   schemas:
     AdminUser:
@@ -86,6 +123,12 @@ components:
             $ref: "#/components/schemas/Error"
     NotFound:
       description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Bad Request
       content:
         application/json:
           schema:

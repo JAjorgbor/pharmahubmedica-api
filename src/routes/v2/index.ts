@@ -44,6 +44,10 @@ const defaultRoutes = [
     route: portalAuthRoute,
   },
   {
+    path: "/portal/users",
+    route: portalUserRoute,
+  },
+  {
     path: "/portal/referral-partners",
     route: portalReferralPartnerRoute,
   },
@@ -54,10 +58,6 @@ const defaultRoutes = [
   {
     path: "/portal/orders",
     route: portalOrderRoute,
-  },
-  {
-    path: "/portal/users",
-    route: portalUserRoute,
   },
   // ADMIN ROUTES
   {

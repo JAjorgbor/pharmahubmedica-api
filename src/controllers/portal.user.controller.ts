@@ -13,6 +13,13 @@ const getPortalUser = catchAsync(async (req: Request, res: Response) => {
   res.status(200).json(portalUser);
 });
 
+const updatePortalUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.portalUser._id.toString();
+  const portalUser = await portalUserService.updatePortalUser(userId, req.body);
+
+  res.status(httpStatus.OK).json(portalUser);
+});
+
 const updatePortalUserPassword = catchAsync(
   async (req: Request, res: Response) => {
     const userId = req.portalUser._id.toString();
@@ -24,5 +31,4 @@ const updatePortalUserPassword = catchAsync(
   },
 );
 
-export default { getPortalUser, updatePortalUserPassword };
-// /portal/users/password/{id} (patch)
+export default { getPortalUser, updatePortalUser, updatePortalUserPassword };

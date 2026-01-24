@@ -45,16 +45,21 @@ const updateAdminUser = async (userId: any, updateBody: any) => {
 };
 
 const updateAdminUserPassword = async (
-  userId: any,
-  oldPassword: any,
-  newPassword: any,
+  userId: string,
+  {
+    currentPassword,
+    newPassword,
+  }: {
+    currentPassword: string;
+    newPassword: string;
+  },
 ) => {
   const user = await getAdminUser({ _id: userId }, true);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "Admin User not found");
   }
-  if (!user || !(await (user as any).isPasswordMatch(oldPassword))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Old password is incorrect");
+  if (!user || !(await (user as any).isPasswordMatch(currentPassword))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Current password is incorrect");
   }
   user.password = newPassword;
   await user.save();

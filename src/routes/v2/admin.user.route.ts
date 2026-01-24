@@ -8,14 +8,16 @@ const router: Router = express.Router();
 
 router.get(
   "/:id",
-  auth("getAdminUsers"),
+  auth(),
   validate(adminUserValidation.getAdminUser),
   adminUserController.getAdminUser,
 );
 
+// router.patch("/me", auth(), adminUserController.updateAdminUser);
+
 router.patch(
-  "/id",
-  auth("updateAdminUserPassword"),
+  "/me/password",
+  auth(),
   validate(adminUserValidation.updateAdminUserPassword),
   adminUserController.updateAdminUserPassword,
 );

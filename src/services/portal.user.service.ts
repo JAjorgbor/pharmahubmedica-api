@@ -82,10 +82,11 @@ const updatePortalUserPassword = async (
     newPassword,
   }: { currentPassword: string; newPassword: string },
 ) => {
-  const user = await getPortalUser({ _id: userId });
+  const user = await getPortalUser({ _id: userId }, true);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "Portal user not found");
   }
+  console.log(currentPassword);
   const isCurrentPasswordCorrect = await (user as any).isPasswordMatch(
     currentPassword,
   );
@@ -93,7 +94,7 @@ const updatePortalUserPassword = async (
     throw new ApiError(httpStatus.BAD_REQUEST, "Current password is incorrect");
 
   user.security!.password = newPassword;
-
+  await user.save();
   return user;
 };
 

@@ -15,13 +15,15 @@ const getAdminUser = catchAsync(async (req: Request, res: Response) => {
 
 const updateAdminUserPassword = catchAsync(
   async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { oldPassword, newPassword } = req.body;
+    const userId = req.adminUser?._id?.toString();
+    const { currentPassword, newPassword } = req.body;
 
     const passwordUpdate = await adminUserService.updateAdminUserPassword(
-      id,
-      oldPassword,
-      newPassword,
+      userId,
+      {
+        currentPassword,
+        newPassword,
+      },
     );
     res.status(200).json(passwordUpdate);
   },
