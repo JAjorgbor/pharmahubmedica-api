@@ -4,12 +4,12 @@ import customValidation from "@/validation/custom.validation.js";
 const createAccount = {
   body: z.object({
     firstName: customValidation.required(z.string(), "First name is required"),
-    lastName: z.string().optional(),
+    lastName: customValidation.required(z.string(), "Last name is required"),
     gender: z.enum(["male", "female"]).optional(),
     email: customValidation.email,
     phoneNumber: customValidation.required(
       z.string(),
-      "Phone number is required"
+      "Phone number is required",
     ),
     password: customValidation.required(z.string().min(8)),
     dateOfBirth: z.string().optional(),

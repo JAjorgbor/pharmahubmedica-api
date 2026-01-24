@@ -20,7 +20,16 @@ const updateAdminUserPassword = {
   }),
 };
 
+const updateAdminUser = z.object({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  gender: z.enum(["male", "female"]).optional(),
+  phoneNumber: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+});
+
 export default {
   getAdminUser,
   updateAdminUserPassword,
+  updateAdminUser,
 };

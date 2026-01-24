@@ -31,7 +31,7 @@ const createAdminUser = async (userBody: any) => {
 const updateAdminUser = async (userId: any, updateBody: any) => {
   const user = await getAdminUser({ _id: userId });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "AdminUser not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "Admin user not found");
   }
   if (
     updateBody.email &&

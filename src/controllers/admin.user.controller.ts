@@ -3,6 +3,9 @@ import httpStatus from "http-status";
 import ApiError from "@/utils/api-error.js";
 import catchAsync from "@/utils/catch-async.js";
 import type { Request, Response } from "express";
+import { handleAssetUpload } from "@/utils/upload-asset.js";
+import customValidation from "@/validation/custom.validation.js";
+import adminUserValidation from "@/validation/admin.user.validation.js";
 
 const getAdminUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -29,4 +32,21 @@ const updateAdminUserPassword = catchAsync(
   },
 );
 
-export default { getAdminUser, updateAdminUserPassword };
+const updateAdminUser = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.adminUser._id.toString();
+  const { image, fields } = await handleAssetUpload(
+    req,
+    `admin-users/${userId}.jpg`,
+    {
+      file: customValidation.imageFileSchema,
+      fields: adminUserValidation.updateAdminUser,
+      requireFile: false,
+    },
+  );
+  const payload = { ...fields, avatar: image };
+  const adminUser = await adminUserService.updateAdminUser(userId, payload);
+
+  res.status(200).json(adminUser);
+});
+
+export default { getAdminUser, updateAdminUserPassword, updateAdminUser };

@@ -13,7 +13,7 @@ router.get(
   adminUserController.getAdminUser,
 );
 
-// router.patch("/me", auth(), adminUserController.updateAdminUser);
+router.patch("/me", auth(), adminUserController.updateAdminUser);
 
 router.patch(
   "/me/password",
