@@ -19,25 +19,25 @@ router
   );
 
 router.get(
-  "/referrals",
+  "/me/referrals",
   portalAuth("referralPartner"),
   portalReferralPartnerController.getReferrals,
 );
 
 router.get(
-  "/referrals/:userId",
+  "/me/referrals/:userId",
   portalAuth("referralPartner"),
   portalReferralPartnerController.getReferredUserDetails,
 );
 
 router.get(
-  "/referrals/:userId/orders",
+  "/me/referrals/:userId/orders",
   portalAuth("referralPartner"),
   portalReferralPartnerController.getReferredUserOrders,
 );
 
 router.get(
-  "/referrals/:userId/orders/:orderId",
+  "/me/referrals/:userId/orders/:orderId",
   portalAuth("referralPartner"),
   portalReferralPartnerController.getReferredUserOrder,
 );

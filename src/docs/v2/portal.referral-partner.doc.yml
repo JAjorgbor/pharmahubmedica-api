@@ -56,7 +56,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /portal/referral-partners/referrals:
+  /portal/referral-partners/me/referrals:
     get:
       tags:
         - Portal Referral Partner
@@ -78,7 +78,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /portal/referral-partners/referrals/{userId}:
+  /portal/referral-partners/me/referrals/{userId}:
     get:
       tags:
         - Portal Referral Partner
@@ -106,7 +106,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
-  /portal/referral-partners/referrals/{userId}/orders:
+  /portal/referral-partners/me/referrals/{userId}/orders:
     get:
       tags:
         - Portal Referral Partner
@@ -134,7 +134,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /portal/referral-partners/referrals/{userId}/orders/{orderId}:
+  /portal/referral-partners/me/referrals/{userId}/orders/{orderId}:
     get:
       tags:
         - Portal Referral Partner

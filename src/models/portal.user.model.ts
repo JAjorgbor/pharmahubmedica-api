@@ -48,7 +48,7 @@ const portalUserSchema = new mongoose.Schema(
         validate(value: string) {
           if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
             throw new Error(
-              "Password must contain at least one letter and one number"
+              "Password must contain at least one letter and one number",
             );
           }
         },
@@ -89,8 +89,17 @@ const portalUserSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
+portalUserSchema.virtual("orderCount", {
+  ref: "Order",
+  localField: "_id",
+  foreignField: "customer",
+  count: true,
+});
 
 /**
  * Check if email is taken

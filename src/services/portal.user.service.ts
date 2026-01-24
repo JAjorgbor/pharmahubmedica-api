@@ -10,19 +10,21 @@ const getPortalUser = async (
   filterParams: Partial<PortalUserType & { _id: string }>,
   includePassword?: boolean,
 ) => {
-  return await PortalUser.findOne(filterParams).select(
-    includePassword ? "+security.password" : "",
-  );
+  return await PortalUser.findOne(filterParams)
+    .select(includePassword ? "+security.password" : "")
+    .populate("orderCount");
 };
 
 const getPortalUsers = async (filterParams: any = {}) => {
-  return await PortalUser.find(filterParams).populate({
-    path: "referredBy",
-    populate: {
-      path: "user",
-      select: "_id firstName lastName email",
-    },
-  });
+  return await PortalUser.find(filterParams)
+    .populate({
+      path: "referredBy",
+      populate: {
+        path: "user",
+        select: "_id firstName lastName email",
+      },
+    })
+    .populate("orderCount");
 };
 
 const createPortalUser = async (userBody: any) => {

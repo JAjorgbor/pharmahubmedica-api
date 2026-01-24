@@ -46,7 +46,7 @@ const getReferrals = catchAsync(async (req: Request, res: Response) => {
   if (!partner) {
     throw new ApiError(httpStatus.NOT_FOUND, "Referral partner not found");
   }
-  const result = await referralPartnerService.getReferralsSummary(
+  const result = await referralPartnerService.getReferredUsers(
     partner._id.toString(),
   );
   res.status(httpStatus.OK).json({ referrals: result });
