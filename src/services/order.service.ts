@@ -137,7 +137,7 @@ const queryOrders = async (
   const orders = await Order.find(finalFilter)
     .sort(options.sortBy || { createdAt: -1 })
     .skip(options.page ? (options.page - 1) * options.limit : 0)
-    .limit(options.limit || 10)
+    .limit(options.limit || Number.MAX_SAFE_INTEGER)
     .populate("customer", "firstName lastName email phoneNumber")
     .populate({
       path: "referralDetails.referralPartner",
