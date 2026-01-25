@@ -1,64 +1,17 @@
 openapi: 3.0.3
 info:
-  title: App API(fragment)
+  title: App API
   version: "1.0.0"
 tags:
-  - name: Apps
-    description: Operations related to apps
+  - name: App
+    description: Operations related to application settings and metadata
 paths:
-  /apps:
-    post:
-      tags:
-        - Apps
-      summary: Create a new app
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AppInput"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/App"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+  /app:
     get:
       tags:
-        - Apps
-      summary: Get all apps
-      parameters:
-        - name: name
-          in: query
-          schema:
-            type: string
-          description: App name
-        - name: sortBy
-          in: query
-          schema:
-            type: string
-          description: sort by query in the form of field:desc/asc (ex. name:asc)
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            default: 10
-          description: Maximum number of apps
-        - name: page
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: Page number
+        - App
+      summary: Get application settings
+      description: Returns the single application settings object
       responses:
         "200":
           description: OK
@@ -67,64 +20,18 @@ paths:
               schema:
                 type: object
                 properties:
-                  results:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/App"
-                  page:
-                    type: integer
-                    example: 1
-                  limit:
-                    type: integer
-                    example: 10
-                  totalPages:
-                    type: integer
-                    example: 1
-                  totalResults:
-                    type: integer
-                    example: 1
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-
-  /apps/{id}:
-    get:
-      tags:
-        - Apps
-      summary: Get a app
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: App id
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/App"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                  app:
+                    $ref: "#/components/schemas/App"
         "404":
           $ref: "#/components/responses/NotFound"
 
-    patch:
+    post:
       tags:
-        - Apps
-      summary: Update a app
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: App id
+        - App
+      summary: Create application settings
+      description: Creates the application settings. Only allows creation if none exist.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -133,40 +40,81 @@ paths:
               $ref: "#/components/schemas/AppInput"
       responses:
         "200":
-          description: OK
+          description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/App"
+                type: object
+                properties:
+                  app:
+                    $ref: "#/components/schemas/App"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
 
-    delete:
+    patch:
       tags:
-        - Apps
-      summary: Delete a app
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: App id
+        - App
+      summary: Update application settings
+      description: Updates the application settings.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppUpdate"
       responses:
         "200":
-          description: No content
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  app:
+                    $ref: "#/components/schemas/App"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+
+  /app/contact:
+    patch:
+      tags:
+        - App
+      summary: Update application contact information
+      description: Specific endpoint to update only contact-related fields.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppContactUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  app:
+                    $ref: "#/components/schemas/App"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
 components:
   schemas:
@@ -178,6 +126,11 @@ components:
         - phoneNumber
         - whatsAppNumber
         - email
+        - status
+        - description
+        - ratings
+        - images
+        - branding
       properties:
         name:
           type: string
@@ -196,20 +149,8 @@ components:
             portal:
               type: string
               enum: [online, offline, waitlist]
-              default: online
         description:
           type: string
-        reviews:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-              rating:
-                type: number
-              comment:
-                type: string
         ratings:
           type: number
         images:
@@ -228,20 +169,25 @@ components:
             logomarkLight:
               type: string
       example:
-        name: PharmaHub App
-        address: 123 Main St
-        phoneNumber: "+1234567890"
-        whatsAppNumber: "+1234567890"
-        email: contact@pharmahub.com
+        name: PharmaHub Medica
+        address: 123 Health Way, Lagos, Nigeria
+        phoneNumber: "+2348000000000"
+        whatsAppNumber: "+2348000000000"
+        email: hello@pharmahubmedica.com
         status:
           portal: online
-        description: A pharmaceutical application
+        description: Premium pharmaceutical delivery service.
+        ratings: 5
+        images: ["https://example.com/image1.jpg"]
+        branding:
+          logo: "https://example.com/logo.png"
+          logoLight: "https://example.com/logo-light.png"
+          logomark: "https://example.com/logomark.png"
+          logomarkLight: "https://example.com/logomark-light.png"
 
-    App:
+    AppUpdate:
       type: object
       properties:
-        id:
-          type: string
         name:
           type: string
         address:
@@ -252,27 +198,15 @@ components:
           type: string
         email:
           type: string
+          format: email
         status:
           type: object
           properties:
             portal:
               type: string
               enum: [online, offline, waitlist]
-        slug:
-          type: string
         description:
           type: string
-        reviews:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-              rating:
-                type: number
-              comment:
-                type: string
         ratings:
           type: number
         images:
@@ -290,10 +224,35 @@ components:
               type: string
             logomarkLight:
               type: string
-        createdAt:
+
+    AppContactUpdate:
+      type: object
+      properties:
+        address:
           type: string
-        updatedAt:
+        phoneNumber:
           type: string
+        whatsAppNumber:
+          type: string
+        email:
+          type: string
+          format: email
+
+    App:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+            slug:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        - $ref: "#/components/schemas/AppInput"
 
     Error:
       type: object

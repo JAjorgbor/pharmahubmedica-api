@@ -45,14 +45,6 @@ const appSchema = new mongoose.Schema(
       type: String,
     },
 
-    reviews: [
-      {
-        name: { type: String },
-        rating: { type: Number },
-        comment: { type: String },
-      },
-    ],
-
     ratings: {
       type: Number,
     },
@@ -68,7 +60,7 @@ const appSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 appSchema.pre("save", function () {

@@ -8,6 +8,7 @@ const adminUserRoles = {
     "getUsers",
     "getAdminUsers",
     "getInventory",
+    "updateApp",
     "updateInventory",
     "updateAdminUser",
     "updateAdminUserRole",
@@ -24,6 +25,7 @@ const adminUserRoles = {
   administrator: [
     "getUsers",
     "getInventory",
+    "updateApp",
     "updateInventory",
     "getAdminUsers",
     "updateAdminUser",
@@ -40,6 +42,7 @@ const adminUserRoles = {
   operations: [
     "getUsers",
     "getAdminUsers",
+    "updateApp",
     "getInventory",
     "updateInventory",
     "updateAdminUser",
