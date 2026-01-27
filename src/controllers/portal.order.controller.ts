@@ -40,11 +40,33 @@ const getOrder = catchAsync(async (req: Request, res: Response) => {
 
 const getPortalUserOrders = catchAsync(async (req: Request, res: Response) => {
   const user = req.portalUser as any;
-  // Use user id from auth instead of params if possible,
-  // but if route doesn't have it, we use auth.
-  // The route for this is / and it doesn't have :userId.
   const orders = await orderService.getPortalUserOrders(user._id.toString());
   res.status(httpStatus.OK).json({ success: true, orders });
 });
 
-export default { createOrder, getOrder, getPortalUserOrders };
+const getPortalUserRecentOrders = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.portalUser as any;
+    const orders = await orderService.getPortalUserRecentOrders(
+      user._id.toString(),
+    );
+    res.status(httpStatus.OK).json({ success: true, orders });
+  },
+);
+const getPortalUserOrderStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.portalUser as any;
+    const stats = await orderService.getPortalUserOrdersStats(
+      user._id.toString(),
+    );
+    res.status(httpStatus.OK).json({ success: true, stats });
+  },
+);
+
+export default {
+  createOrder,
+  getOrder,
+  getPortalUserOrders,
+  getPortalUserRecentOrders,
+  getPortalUserOrderStats,
+};

@@ -11,20 +11,27 @@ router
   .get(
     portalAuth(),
     validate(orderValidation.getOrders),
-    orderController.getPortalUserOrders
+    orderController.getPortalUserOrders,
   )
   .post(
     portalAuth(),
     validate(orderValidation.createOrder),
-    orderController.createOrder
+    orderController.createOrder,
   );
+
+router
+  .route("/stats")
+  .get(portalAuth(), orderController.getPortalUserOrderStats);
+router
+  .route("/recent")
+  .get(portalAuth(), orderController.getPortalUserRecentOrders);
 
 router
   .route("/:orderId")
   .get(
     portalAuth(),
     validate(orderValidation.getOrder),
-    orderController.getOrder
+    orderController.getOrder,
   );
 
 export default router;

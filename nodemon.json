@@ -1,6 +1,6 @@
 {
   "watch": ["src"],
-  "ext": "ts,js,json,yml",
+  "ext": "ts,js,json",
   "ignore": ["node_modules"],
   "legacyWatch": true,
   "exec": "tsx src/index.ts"

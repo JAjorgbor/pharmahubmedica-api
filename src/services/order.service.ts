@@ -122,6 +122,72 @@ const getPortalUserOrders = async (portalUserId: string) => {
     });
   return orders;
 };
+const getPortalUserRecentOrders = async (portalUserId: string) => {
+  const portalUser = await portalUserService.getPortalUser({
+    _id: portalUserId,
+  });
+  if (!portalUser)
+    throw new ApiError(httpStatus.NOT_FOUND, "Portal User not found");
+  const orders = await Order.find({ customer: portalUser._id.toString() })
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .populate("customer", "firstName lastName email phoneNumber")
+    .populate({
+      path: "referralDetails.referralPartner",
+      populate: {
+        path: "user",
+        select: "_id firstName lastName email phoneNumber",
+      },
+    });
+  return orders;
+};
+const getPortalUserOrdersStats = async (portalUserId: string) => {
+  const portalUser = await portalUserService.getPortalUser({
+    _id: portalUserId,
+  });
+  if (!portalUser)
+    throw new ApiError(httpStatus.NOT_FOUND, "Portal User not found");
+
+  const totalOrders = await Order.countDocuments({
+    customer: portalUser._id.toString(),
+  });
+  const processing = await Order.countDocuments({
+    customer: portalUser._id.toString(),
+    orderStatus: "processing",
+  });
+  const delivered = await Order.countDocuments({
+    customer: portalUser._id.toString(),
+    orderStatus: "delivered",
+  });
+  const cancelled = await Order.countDocuments({
+    customer: portalUser._id.toString(),
+    orderStatus: "cancelled",
+  });
+  const inTransit = await Order.countDocuments({
+    customer: portalUser._id.toString(),
+    orderStatus: "in-transit",
+  });
+  const totalSpent = await Order.aggregate([
+    {
+      $match: { customer: portalUser._id, paymentStatus: "paid" },
+    },
+    {
+      $group: {
+        _id: null,
+        totalSpent: { $sum: "$transaction.totalAmount" },
+      },
+    },
+  ]);
+  console.log(totalSpent);
+  return {
+    totalOrders,
+    processing,
+    delivered,
+    cancelled,
+    inTransit,
+    totalSpent: totalSpent[0]?.totalSpent || 0,
+  };
+};
 
 const queryOrders = async (
   filter: Record<string, any>,
@@ -291,5 +357,7 @@ export default {
   getOrder,
   queryOrders,
   updateOrder,
+  getPortalUserRecentOrders,
   updateOrderProducts,
+  getPortalUserOrdersStats,
 };
