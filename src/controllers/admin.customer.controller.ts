@@ -18,7 +18,7 @@ const getCustomer = catchAsync(async (req: Request, res: Response) => {
 const updateCustomer = catchAsync(async (req: Request, res: Response) => {
   const user = await portalUserService.updatePortalUser(
     req.params.userId!,
-    req.body
+    req.body,
   );
   res.send({ customer: user });
 });
@@ -34,7 +34,14 @@ const getNonReferralPartners = catchAsync(
       isReferralPartner: false,
     });
     res.send({ customers: users });
-  }
+  },
+);
+
+const getGeneralCustomersStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const stats = await portalUserService.getGeneralPortalUsersStats();
+    res.status(200).json({ stats });
+  },
 );
 
 export default {
@@ -43,4 +50,5 @@ export default {
   updateCustomer,
   deleteCustomer,
   getNonReferralPartners,
+  getGeneralCustomersStats,
 };

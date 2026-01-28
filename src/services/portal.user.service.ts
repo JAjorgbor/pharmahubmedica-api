@@ -108,6 +108,25 @@ const updatePortalUserPassword = async (
   return user;
 };
 
+const getGeneralPortalUsersStats = async () => {
+  const totalUsers = await PortalUser.countDocuments();
+  const activeUsers = await PortalUser.countDocuments({
+    status: "active",
+  });
+  const inactiveUsers = await PortalUser.countDocuments({
+    status: "inactive",
+  });
+  const pendingUsers = await PortalUser.countDocuments({
+    status: "pending",
+  });
+  return {
+    totalUsers,
+    activeUsers,
+    inactiveUsers,
+    pendingUsers,
+  };
+};
+
 export default {
   createPortalUser,
   updatePortalUser,
@@ -115,4 +134,5 @@ export default {
   getPortalUsers,
   deletePortalUser,
   updatePortalUserPassword,
+  getGeneralPortalUsersStats,
 };

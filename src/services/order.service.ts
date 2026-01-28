@@ -178,7 +178,6 @@ const getPortalUserOrdersStats = async (portalUserId: string) => {
       },
     },
   ]);
-  console.log(totalSpent);
   return {
     totalOrders,
     processing,
@@ -186,6 +185,40 @@ const getPortalUserOrdersStats = async (portalUserId: string) => {
     cancelled,
     inTransit,
     totalSpent: totalSpent[0]?.totalSpent || 0,
+  };
+};
+const getGeneralOrdersStats = async () => {
+  const totalOrders = await Order.countDocuments();
+  const processing = await Order.countDocuments({
+    orderStatus: "processing",
+  });
+  const delivered = await Order.countDocuments({
+    orderStatus: "delivered",
+  });
+  const cancelled = await Order.countDocuments({
+    orderStatus: "cancelled",
+  });
+  const inTransit = await Order.countDocuments({
+    orderStatus: "in-transit",
+  });
+  const totalRevenue = await Order.aggregate([
+    {
+      $match: { paymentStatus: "paid" },
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$transaction.totalAmount" },
+      },
+    },
+  ]);
+  return {
+    totalOrders,
+    processing,
+    delivered,
+    cancelled,
+    inTransit,
+    totalRevenue: totalRevenue[0]?.totalRevenue || 0,
   };
 };
 
@@ -360,4 +393,5 @@ export default {
   getPortalUserRecentOrders,
   updateOrderProducts,
   getPortalUserOrdersStats,
+  getGeneralOrdersStats,
 };

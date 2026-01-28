@@ -29,10 +29,18 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   res.status(201).json({ message });
 });
 
+const getGeneralProductsStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const stats = await productService.getGeneralProductsStats();
+    res.status(200).json({ stats });
+  },
+);
+
 export default {
   getProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
+  getGeneralProductsStats,
 };

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { type PipelineStage } from "mongoose";
 import ReferralPartner from "@/models/referral-partner.model.js";
 import PortalUser from "@/models/portal.user.model.js";
 import portalUserService from "@/services/portal.user.service.js";
@@ -148,6 +148,102 @@ const getReferredUsers = async (partnerId: string) => {
   });
 };
 
+const getTopReferralPartners = async () => {
+  const pipeline: PipelineStage[] = [
+    // Optional: only active partners
+    { $match: { status: "active" } },
+
+    // 1) Count referrals (Portal_User where referredBy = this partner _id)
+    {
+      $lookup: {
+        from: "portal_users", // <-- confirm actual name (see note below)
+        let: { partnerId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$referredBy", "$$partnerId"] },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "referralsMeta",
+      },
+    },
+    {
+      $addFields: {
+        referralsCount: { $ifNull: [{ $first: "$referralsMeta.count" }, 0] },
+      },
+    },
+
+    // 2) Sum total earned from Orders for this partner
+    {
+      $lookup: {
+        from: "orders", // <-- confirm actual name
+        let: { partnerId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$referralDetails.referralPartner", "$$partnerId"],
+              },
+              // common filters:
+              // if you only want orders that have been paid for, uncomment:
+              // paymentStatus: "paid",
+              // if you only want commissions actually paid out, uncomment:
+              // "referralDetails.commission.status": "paid",
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              commissionTotal: { $sum: "$referralDetails.commission.amount" },
+              orders: { $sum: 1 },
+            },
+          },
+        ],
+        as: "earningsMeta",
+      },
+    },
+    {
+      $addFields: {
+        commissionTotal: {
+          $ifNull: [{ $first: "$earningsMeta.commissionTotal" }, 0],
+        },
+        ordersAttributed: {
+          $ifNull: [{ $first: "$earningsMeta.ordersAttributed" }, 0],
+        },
+      },
+    },
+
+    // 3) Join the partner’s user profile (name/email) if you want it in the output
+    {
+      $lookup: {
+        from: "portal_users", // <-- same note
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+
+    // Clean up helper arrays + shape output
+    {
+      $project: {
+        referralsMeta: 0,
+        earningsMeta: 0,
+        "user.security": 0, // just in case
+      },
+    },
+
+    // 4) Rank
+    { $sort: { referralsCount: -1, commissionTotal: -1, createdAt: 1 } },
+    { $limit: 10 },
+  ];
+
+  const leaderboard = await ReferralPartner.aggregate(pipeline);
+  return leaderboard;
+};
+
 export default {
   getReferralPartner,
   getReferralPartners,
@@ -156,4 +252,5 @@ export default {
   toggleReferralPartnerStatus,
   deleteReferralPartner,
   getReferredUsers,
+  getTopReferralPartners,
 };

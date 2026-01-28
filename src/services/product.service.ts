@@ -35,7 +35,7 @@ const getVisibleProductsForCategory = async (
   filterOptions?: {
     priceRange?: { max: string; min: string };
     subcategorySlugs?: string[];
-  }
+  },
 ) => {
   const { limit, skip, getPaginationMeta } = pagination;
   let products = [];
@@ -107,16 +107,16 @@ const createProduct = async (req: Request) => {
 
         if (
           !category.subcategories.find(
-            (each) => each._id == parsedFields.subcategory
+            (each) => each._id == parsedFields.subcategory,
           )
         ) {
           throw new ApiError(
             httpStatus.BAD_REQUEST,
-            `Selected subcategory does not belong to ${category.name}`
+            `Selected subcategory does not belong to ${category.name}`,
           );
         }
       },
-    }
+    },
   );
   payload = { ...fields, image, _id };
   const product = await Product.create(payload);
@@ -137,16 +137,16 @@ const updateProduct = async (productId: string, req: Request) => {
 
         if (
           !category.subcategories.find(
-            (each) => each._id == parsedFields.subcategory
+            (each) => each._id == parsedFields.subcategory,
           )
         ) {
           throw new ApiError(
             httpStatus.BAD_REQUEST,
-            `Selected subcategory does not belong to ${category.name}`
+            `Selected subcategory does not belong to ${category.name}`,
           );
         }
       },
-    }
+    },
   );
 
   let payload: ProductDoc = { ...fields, image };
@@ -170,6 +170,35 @@ const deleteProduct = async (id: string) => {
   return "Product deleted successfully";
 };
 
+const getGeneralProductsStats = async () => {
+  const total = await Product.countDocuments();
+  const visible = await Product.countDocuments({ visible: true });
+  const invisible = await Product.countDocuments({ visible: false });
+  const instock = await Product.countDocuments({ inStock: true });
+  const outofstock = await Product.countDocuments({ inStock: false });
+
+  const totalInventoryUnitCostResult = await Product.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalInventoryUnitCost: { $sum: "$price" },
+      },
+    },
+  ]);
+
+  const totalInventoryUnitCost =
+    totalInventoryUnitCostResult[0]?.totalInventoryUnitCost ?? 0;
+
+  return {
+    total,
+    visible,
+    invisible,
+    instock,
+    outofstock,
+    totalInventoryUnitCost,
+  };
+};
+
 export default {
   getProduct,
   getProducts,
@@ -177,4 +206,5 @@ export default {
   updateProduct,
   getVisibleProductsForCategory,
   deleteProduct,
+  getGeneralProductsStats,
 };

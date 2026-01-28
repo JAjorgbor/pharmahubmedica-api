@@ -18,7 +18,7 @@ const getReferralPartner = catchAsync(async (req: Request, res: Response) => {
 
 const addReferralPartner = catchAsync(async (req: Request, res: Response) => {
   const referralPartner = await referralPartnerService.addReferralPartner(
-    req.body
+    req.body,
   );
   res.status(httpStatus.CREATED).send(referralPartner);
 });
@@ -30,12 +30,12 @@ const updateReferralPartner = catchAsync(
       ...req.body,
     });
     res.send({ partner: result });
-  }
+  },
 );
 
 const togglePartnerStatus = catchAsync(async (req: Request, res: Response) => {
   const result = await referralPartnerService.toggleReferralPartnerStatus(
-    req.params.partnerId!
+    req.params.partnerId!,
   );
   res.send({ partner: result });
 });
@@ -46,7 +46,7 @@ const deleteReferralPartner = catchAsync(
       _id: req.params.partnerId!,
     });
     res.status(httpStatus.NO_CONTENT).send();
-  }
+  },
 );
 
 const getReferralPartnerReferrals = catchAsync(
@@ -55,7 +55,14 @@ const getReferralPartnerReferrals = catchAsync(
       referredBy: req.params.partnerId,
     });
     res.send({ referrals: result });
-  }
+  },
+);
+
+const getTopReferralPartners = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await referralPartnerService.getTopReferralPartners();
+    res.send({ partners: result });
+  },
 );
 
 export default {
@@ -66,4 +73,5 @@ export default {
   togglePartnerStatus,
   deleteReferralPartner,
   getReferralPartnerReferrals,
+  getTopReferralPartners,
 };

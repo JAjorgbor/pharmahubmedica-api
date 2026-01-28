@@ -11,20 +11,24 @@ router
   .get(
     auth("getOrders"),
     validate(orderValidation.getOrders),
-    orderController.getOrders
+    orderController.getOrders,
   );
+
+router
+  .route("/stats")
+  .get(auth("getOrders"), orderController.getGeneralOrdersStats);
 
 router
   .route("/:orderId")
   .get(
     auth("getOrders"),
     validate(orderValidation.adminGetOrder),
-    orderController.getOrder
+    orderController.getOrder,
   )
   .patch(
     auth("manageOrders"),
     validate(orderValidation.updateOrder),
-    orderController.updateOrderStatus
+    orderController.updateOrderStatus,
   );
 
 router
@@ -32,7 +36,7 @@ router
   .patch(
     auth("manageOrders"),
     validate(orderValidation.updateOrderProducts),
-    orderController.updateOrderProducts
+    orderController.updateOrderProducts,
   );
 
 export default router;

@@ -43,4 +43,17 @@ const updateOrderProducts = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({ success: true, order });
 });
 
-export default { getOrders, getOrder, updateOrderStatus, updateOrderProducts };
+const getGeneralOrdersStats = catchAsync(
+  async (req: Request, res: Response) => {
+    const stats = await orderService.getGeneralOrdersStats();
+    res.status(httpStatus.OK).json({ success: true, stats });
+  },
+);
+
+export default {
+  getOrders,
+  getOrder,
+  updateOrderStatus,
+  updateOrderProducts,
+  getGeneralOrdersStats,
+};

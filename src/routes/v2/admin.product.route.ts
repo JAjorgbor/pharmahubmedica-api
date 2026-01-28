@@ -6,20 +6,26 @@ const router: Router = express.Router();
 
 router.get("/", auth("getInventory"), adminProductController.getProducts);
 
-router.get("/:id", auth("getInventory"), adminProductController.getProductById);
-
 router.post("/", auth("updateInventory"), adminProductController.createProduct);
+
+router.get(
+  "/stats",
+  auth("getInventory"),
+  adminProductController.getGeneralProductsStats,
+);
+
+router.get("/:id", auth("getInventory"), adminProductController.getProductById);
 
 router.patch(
   "/:id",
   auth("updateInventory"),
-  adminProductController.updateProduct
+  adminProductController.updateProduct,
 );
 
 router.delete(
   "/:id",
   auth("updateInventory"),
-  adminProductController.deleteProduct
+  adminProductController.deleteProduct,
 );
 
 export default router;

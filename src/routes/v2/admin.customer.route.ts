@@ -10,14 +10,20 @@ router.get(
   "/",
   auth("getUsers"),
   validate(adminCustomerValidation.getCustomers),
-  adminCustomerController.getCustomers
+  adminCustomerController.getCustomers,
 );
 
 router.get(
   "/non-referral-partners",
   auth("manageCustomers"),
   validate(adminCustomerValidation.getNonReferralPartners),
-  adminCustomerController.getNonReferralPartners
+  adminCustomerController.getNonReferralPartners,
+);
+
+router.get(
+  "/stats",
+  auth("getUsers"),
+  adminCustomerController.getGeneralCustomersStats,
 );
 
 router
@@ -25,17 +31,17 @@ router
   .get(
     auth("getUsers"),
     validate(adminCustomerValidation.getCustomer),
-    adminCustomerController.getCustomer
+    adminCustomerController.getCustomer,
   )
   .patch(
     auth("manageCustomers"),
     validate(adminCustomerValidation.updateCustomer),
-    adminCustomerController.updateCustomer
+    adminCustomerController.updateCustomer,
   )
   .delete(
     auth("manageCustomers"),
     validate(adminCustomerValidation.deleteCustomer),
-    adminCustomerController.deleteCustomer
+    adminCustomerController.deleteCustomer,
   );
 
 export default router;
