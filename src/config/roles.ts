@@ -61,6 +61,7 @@ const adminUserRoles = {
     "getAdminUsers",
     "getInventory",
     "updateInventory",
+    "getReferralPartners",
     "manageOrders",
     "getOrders",
   ],
@@ -68,10 +69,17 @@ const adminUserRoles = {
     "getUsers",
     "getAdminUsers",
     "getInventory",
+    "getReferralPartners",
     "updateInventory",
     "getOrders",
   ],
-  accountant: ["getUsers", "getAdminUsers", "getInventory", "getOrders"],
+  accountant: [
+    "getUsers",
+    "getAdminUsers",
+    "getReferralPartners",
+    "getInventory",
+    "getOrders",
+  ],
   driver: ["getUsers", "getAdminUsers", "getInventory", "getOrders"],
 } as const;
 
