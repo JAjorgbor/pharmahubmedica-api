@@ -19,7 +19,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   `http://localhost:${config.port}`,
-  "https://pharmahubmedica.ng",
+  "https://admin-sandbox.pharmahubmedica.ng",
+  "https://admin.pharmahubmedica.ng",
   "https://sandbox.pharmahubmedica.ng",
   "https://v2.pharmahubmedica.ng",
 ];
