@@ -15,15 +15,27 @@ import config from "@/config/config.js";
 
 const app: Application = express();
 
-const allowedOrigins = [
+/** Explicit origins (local/dev, etc.) */
+const explicitAllowedOrigins = new Set<string>([
   "http://localhost:3000",
   "http://localhost:3001",
   `http://localhost:${config.port}`,
-  "https://admin-sandbox.pharmahubmedica.ng",
-  "https://admin.pharmahubmedica.ng",
-  "https://sandbox.pharmahubmedica.ng",
-  "https://v2.pharmahubmedica.ng",
-];
+]);
+
+/** Allow root + any subdomain that ends with .pharmahubmedica.ng */
+function isAllowedOrigin(origin: string) {
+  try {
+    const { hostname } = new URL(origin);
+
+    // allow exact root domain
+    if (hostname === "pharmahubmedica.ng") return true;
+
+    // allow any subdomain *.pharmahubmedica.ng
+    return hostname.endsWith(".pharmahubmedica.ng");
+  } catch {
+    return false;
+  }
+}
 
 /* Middleware */
 app.use(logger("dev"));
@@ -48,10 +60,15 @@ app.use(compression());
 // Ensure CORS headers are present even when errors happen (incl. preflight)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
+
+  if (
+    origin &&
+    (explicitAllowedOrigins.has(origin) || isAllowedOrigin(origin))
+  ) {
     res.header("Access-Control-Allow-Origin", origin);
     res.header("Access-Control-Allow-Credentials", "true");
   }
+
   next();
 });
 
@@ -61,7 +78,9 @@ const corsOptions: cors.CorsOptions = {
     // allow requests with no origin (Postman, curl, server-to-server)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (explicitAllowedOrigins.has(origin) || isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
 
     return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
