@@ -16,7 +16,13 @@ const getApp = async () => {
 };
 
 const updateApp = async (payload: any) => {
-  const app = await App.findOneAndUpdate({}, { $set: payload }, { new: true });
+  const app = await App.findOne();
+  if (!app) {
+    throw new Error("App not found");
+  }
+
+  app.set(payload);
+  await app.save();
   return app;
 };
 
