@@ -33,7 +33,7 @@ const getCategories = async () =>
         httpStatus.INTERNAL_SERVER_ERROR,
         error.message || "Unable to fetch categories",
         false,
-        error.stack
+        error.stack,
       );
     }
   };
@@ -55,7 +55,7 @@ const getVisibleCategories = async (pagination: PaginationResult) => {
       httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "Unable to fetch categories",
       false,
-      error.stack
+      error.stack,
     );
   }
 };
@@ -79,7 +79,7 @@ const getCategory = async (filterOptions: any) => {
       httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "Unable to fetch category",
       false,
-      error.stack
+      error.stack,
     );
   }
 };
@@ -95,19 +95,18 @@ const createCategory = async (req: Request) => {
         fields: adminCategoryValidation.createCategory,
         file: customValidation.imageFileSchema,
         requireFile: true,
-      }
+      },
     );
     let subcategories = fields.subcategories.map((each: Subcategory) => ({
       ...each,
       category: _id,
     }));
 
-    subcategories = await subcategoryService.createManySubcategories(
-      subcategories
-    );
+    subcategories =
+      await subcategoryService.createManySubcategories(subcategories);
 
     fields.subcategories = subcategories.map(
-      (each: SubcategoryDoc) => each._id
+      (each: SubcategoryDoc) => each._id,
     );
 
     payload = { ...fields, image, _id };
@@ -123,7 +122,7 @@ const createCategory = async (req: Request) => {
       httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "Unable to create category",
       false,
-      error.stack
+      error.stack,
     );
   }
 };
@@ -137,7 +136,7 @@ const updateCategory = async (categoryId: string, req: Request) => {
         fields: adminCategoryValidation.updateCategory,
         file: customValidation.imageFileSchema,
         requireFile: true,
-      }
+      },
     );
 
     let subcategories = fields.subcategories.map(
@@ -149,25 +148,23 @@ const updateCategory = async (categoryId: string, req: Request) => {
           _id: each._id === "none" ? fallbackId : each._id,
           category: categoryId,
         };
-      }
+      },
     );
 
-    subcategories = await subcategoryService.updateManySubcategories(
-      subcategories
-    );
+    subcategories =
+      await subcategoryService.updateManySubcategories(subcategories);
     fields.subcategories = subcategories.map(
-      (each: SubcategoryDoc) => each._id
+      (each: SubcategoryDoc) => each._id,
     );
 
     let payload: CategoryDoc = { ...fields, image };
 
-    const category = await Category.findOneAndUpdate(
-      { _id: categoryId },
-      { $set: payload },
-      {
-        new: true,
-      }
-    );
+    const category = await Category.findOne({ _id: categoryId });
+    if (!category) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Category not found");
+    }
+    category.set(payload);
+    await category.save();
 
     return category;
   } catch (error: any) {
@@ -179,7 +176,7 @@ const updateCategory = async (categoryId: string, req: Request) => {
       httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "Unable to update category",
       false,
-      error.stack
+      error.stack,
     );
   }
 };
@@ -206,7 +203,7 @@ const deleteCategory = async (id: string) => {
       httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "Unable to delete category",
       false,
-      error.stack
+      error.stack,
     );
   }
 };
