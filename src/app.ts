@@ -15,69 +15,18 @@ import config from "@/config/config.js";
 
 const app: Application = express();
 
-/** Explicit origins (local/dev, etc.) */
-const explicitAllowedOrigins = new Set<string>([
+const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   `http://localhost:${config.port}`,
-]);
+  "https://admin-sandbox.pharmahubmedica.ng",
+  "https://admin.pharmahubmedica.ng",
+  "https://sandbox.pharmahubmedica.ng",
+  "https://v2.pharmahubmedica.ng",
+  "https://pharmahubmedica.ng",
+];
 
-/** Allow root + any subdomain that ends with .pharmahubmedica.ng */
-function isAllowedOrigin(origin: string) {
-  try {
-    const { hostname } = new URL(origin);
-    return (
-      hostname === "pharmahubmedica.ng" ||
-      hostname.endsWith(".pharmahubmedica.ng")
-    );
-  } catch {
-    return false;
-  }
-}
-
-function isWhitelisted(origin: string) {
-  return explicitAllowedOrigins.has(origin) || isAllowedOrigin(origin);
-}
-
-/**
- * IMPORTANT:
- * - With credentials:true you cannot use "*" for Access-Control-Allow-Origin.
- * - Preflight must get CORS headers, so CORS must run BEFORE routes/middlewares that may short-circuit.
- */
-const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    // allow server-to-server / Postman / curl
-    if (!origin) return callback(null, true);
-
-    if (isWhitelisted(origin)) return callback(null, true);
-
-    return callback(new Error(`Not allowed by CORS: ${origin}`));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 204,
-};
-
-// ✅ Put CORS FIRST (before anything else)
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  // Ensure caches/proxies don't mix responses across origins
-  res.header("Vary", "Origin");
-
-  if (origin && isWhitelisted(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header("Access-Control-Allow-Credentials", "true");
-  }
-  next();
-});
-
-// ✅ Handle preflight early for all routes
-app.options("*", cors(corsOptions));
-app.use(cors(corsOptions));
-
-/* Middleware (after CORS) */
+/* Middleware */
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -96,6 +45,34 @@ passport.use("jwt", jwtStrategy);
 
 // gzip compression
 app.use(compression());
+
+// Ensure CORS headers are present even when errors happen (incl. preflight)
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
+  next();
+});
+
+// enable cors (single config used for both normal + preflight)
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 /* Routes */
 app.use("/v2", routes);
