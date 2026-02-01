@@ -2,7 +2,7 @@ import z, { ZodArray, ZodNumber, ZodString, ZodType } from "zod";
 
 const imageFileSchema = z.object({
   mimeType: z.enum(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]),
-  size: z.number().max(5 * 1024 * 1024), // 5MB
+  size: z.number().max(10 * 1024 * 1024), // 10MB
   filename: z.string().min(1),
 });
 
