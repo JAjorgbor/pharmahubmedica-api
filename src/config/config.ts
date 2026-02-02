@@ -28,6 +28,7 @@ const envVarsSchema = z.object({
   // SMTP_USERNAME: z.string(),
   // SMTP_PASSWORD: z.string(),
   //   GOOGLE_SERVICE_ACCOUNT: z.string(),
+  PAYSTACK_SECRET_KEY: z.string(),
 });
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
@@ -82,5 +83,8 @@ export default {
       name: envVars.data.EMAIL_FROM_NAME,
       address: envVars.data.EMAIL_FROM_ADDRESS,
     },
+  },
+  paystack: {
+    secretKey: envVars.data.PAYSTACK_SECRET_KEY,
   },
 };

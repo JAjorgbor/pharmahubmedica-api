@@ -18,6 +18,7 @@ import portalReferralPartnerRoute from "@/routes/v2/portal.referral-partner.rout
 import portalUserRoute from "@/routes/v2/portal.user.route.js";
 import productRoute from "@/routes/v2/product.route.js";
 import testRoute from "@/routes/v2/test.js";
+import adminBankRoute from "@/routes/v2/admin.bank.route.js";
 import express, { Router } from "express";
 import swaggerUi from "swagger-ui-express";
 
@@ -72,6 +73,10 @@ const defaultRoutes = [
   {
     path: "/admin/users",
     route: adminUserRoute,
+  },
+  {
+    path: "/admin/banks",
+    route: adminBankRoute,
   },
   {
     path: "/admin/customers",
