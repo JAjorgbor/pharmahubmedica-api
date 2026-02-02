@@ -15,6 +15,16 @@ import config from "@/config/config.js";
 
 const app: Application = express();
 
+/**
+ * 1️⃣ Disable caching for ALL API responses
+ *    (critical on Netlify / serverless + CORS)
+ */
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Vary", "Origin"); // keep responses origin-safe
+  next();
+});
+
 /** Explicit origins (local/dev, etc.) */
 const explicitAllowedOrigins = new Set<string>([
   "http://localhost:3000",
@@ -59,17 +69,9 @@ const corsOptions: cors.CorsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// ✅ Put CORS FIRST (before anything else)
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  // Ensure caches/proxies don't mix responses across origins
-  res.header("Vary", "Origin");
-
-  if (origin && isWhitelisted(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header("Access-Control-Allow-Credentials", "true");
-  }
+  // make caches keep per-origin variants
+  res.setHeader("Vary", "Origin");
   next();
 });
 
