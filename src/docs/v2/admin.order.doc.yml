@@ -9,6 +9,56 @@ tags:
 
 paths:
   /admin/orders:
+    post:
+      summary: Create a new order
+      tags: [Admin Order]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer, items, deliveryAddress, deliveryMethod]
+              properties:
+                customer:
+                  type: string
+                  description: Customer ID
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [productId, quantity]
+                    properties:
+                      productId:
+                        type: string
+                      quantity:
+                        type: integer
+                        minimum: 1
+                deliveryAddress:
+                  type: string
+                  description: Delivery Address ID
+                deliveryMethod:
+                  type: string
+                  description: Delivery Method ID
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  order:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/Unauthorized"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
     get:
       summary: Get all orders
       tags: [Admin Order]

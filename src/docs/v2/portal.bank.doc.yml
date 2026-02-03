@@ -1,10 +1,10 @@
 paths:
-  /admin/banks:
+  /portal/banks:
     get:
       summary: Get all banks
       description: Retrieve a list of all available banks.
       tags:
-        - Admin Bank
+        - Portal Bank
       security:
         - bearerAuth: []
       responses:
@@ -22,12 +22,14 @@ paths:
         "500":
           description: Internal Server Error
 
-  /admin/banks/validate-account:
+  /portal/banks/validate-account:
     get:
       summary: Validate bank account
       description: Validate bank account details using Paystack API.
       tags:
-        - Admin Bank
+        - Portal Bank
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: accountNumber
