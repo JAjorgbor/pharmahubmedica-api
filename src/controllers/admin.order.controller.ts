@@ -5,6 +5,11 @@ import httpStatus from "http-status";
 import { type Request, type Response } from "express";
 import ApiError from "@/utils/api-error.js";
 
+const createOrder = catchAsync(async (req: Request, res: Response) => {
+  const order = await orderService.createOrder(req.body);
+  res.status(httpStatus.CREATED).json({ success: true, order });
+});
+
 const getOrders = catchAsync(async (req: Request, res: Response) => {
   const filter = pick(req.query, [
     "orderStatus",
@@ -51,6 +56,7 @@ const getGeneralOrdersStats = catchAsync(
 );
 
 export default {
+  createOrder,
   getOrders,
   getOrder,
   updateOrderStatus,

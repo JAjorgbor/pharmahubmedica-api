@@ -21,6 +21,7 @@ import testRoute from "@/routes/v2/test.js";
 import adminBankRoute from "@/routes/v2/admin.bank.route.js";
 import express, { Router } from "express";
 import swaggerUi from "swagger-ui-express";
+import portalBankRoute from "@/routes/v2/portal.bank.route.js";
 
 const router: Router = express.Router();
 
@@ -64,6 +65,10 @@ const defaultRoutes = [
   {
     path: "/portal/orders",
     route: portalOrderRoute,
+  },
+  {
+    path: "/portal/banks",
+    route: portalBankRoute,
   },
   // ADMIN ROUTES
   {

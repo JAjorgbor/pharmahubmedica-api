@@ -12,6 +12,11 @@ router
     auth("getOrders"),
     validate(orderValidation.getOrders),
     orderController.getOrders,
+  )
+  .post(
+    auth("manageOrders"),
+    validate(orderValidation.createOrder),
+    orderController.createOrder,
   );
 
 router
