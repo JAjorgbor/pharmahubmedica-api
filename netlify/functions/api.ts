@@ -6,5 +6,11 @@ const expressHandler = serverless(app);
 
 export const handler = async (event: any, context: any) => {
   await connectDb();
+
+  // strip Netlify prefix
+  if (event.path) {
+    event.path = event.path.replace(/^\/\.netlify\/functions\/[^/]+/, "");
+  }
+
   return expressHandler(event, context);
 };
