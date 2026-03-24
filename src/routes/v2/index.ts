@@ -150,7 +150,7 @@ if (!isNetlify) {
           <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
           <script>
             SwaggerUIBundle({
-              url: '/.netlify/functions/api/swagger.json',
+              url: '/.netlify/functions/api/v2/swagger.json',
               dom_id: '#swagger-ui'
             });
           </script>
