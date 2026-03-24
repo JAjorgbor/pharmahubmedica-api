@@ -36,15 +36,20 @@ const options = {
       // },
     ],
   },
-  apis: isNetlify
-    ? [
-        path.resolve("dist/routes/**/*.js"),
-        path.resolve("src/docs/v2/*.doc.yml"),
-      ]
-    : [
-        path.resolve("src/routes/**/*.ts"),
-        path.resolve("src/docs/v2/*.doc.yml"),
-      ],
+  apis: [
+    "./src/routes/**/*.{ts,js}",
+    "./dist/routes/**/*.js",
+    "./src/docs/v2/*.doc.yml",
+  ],
+  // isNetlify
+  //   ? [
+  //       path.resolve("dist/routes/**/*.js"),
+  //       path.resolve("src/docs/v2/*.doc.yml"),
+  //     ]
+  //   : [
+  //       path.resolve("src/routes/**/*.ts"),
+  //       path.resolve("src/docs/v2/*.doc.yml"),
+  //     ],
 };
 
 export const createSwaggerSpec = () => swaggerJsdoc(options);
