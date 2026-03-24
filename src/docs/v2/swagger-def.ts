@@ -23,7 +23,7 @@ const options = {
     servers: [
       isNetlify
         ? {
-            url: "/.netlify/functions/api",
+            url: "/.netlify/functions/api/v2",
             description: "Netlify Production",
           }
         : {
