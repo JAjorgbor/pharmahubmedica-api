@@ -37,8 +37,8 @@ const options = {
     ],
   },
   apis: [
-    "./src/routes/**/*.{ts,js}",
-    "./dist/routes/**/*.js",
+    "./src/routes/v2/**/*.{ts,js}",
+    "./dist/routes/v2/**/*.js",
     "./src/docs/v2/*.doc.yml",
   ],
   // isNetlify
