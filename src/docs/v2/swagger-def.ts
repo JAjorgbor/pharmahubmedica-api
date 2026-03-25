@@ -18,13 +18,13 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${5000}/v2`,
+        url: `http://localhost:${5500}/v2`,
         description: "Local server",
       },
-      // {
-      //   url: `https://api-sandbox.pharmahubmedica.ng/v2`,
-      //   description: "Sandbox server",
-      // },
+      {
+        url: `https://api-sandbox.pharmahubmedica.ng/v2`,
+        description: "Sandbox server",
+      },
     ],
   },
   apis: ["./src/routes/**/*.ts", "./src/docs/v2/*.doc.yml"],
