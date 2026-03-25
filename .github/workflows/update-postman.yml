@@ -1,0 +1,27 @@
+name: Update Postman Docs
+
+on:
+  push:
+    branches:
+      - sandbox
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Swagger JSON
+        run: node scripts/build-swagger.js
+
+      - name: Update Postman collection
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+        run: |
+          curl -X PUT "https://api.getpostman.com/collections/POSTMAN_COLLECTION_UID" \
+            -H "X-Api-Key: $POSTMAN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d @swagger.json

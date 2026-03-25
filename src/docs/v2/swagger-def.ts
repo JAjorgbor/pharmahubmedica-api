@@ -5,7 +5,6 @@ import pkg from "../../../package.json" with { type: "json" };
 import path from "path";
 
 const { version } = pkg;
-const isNetlify = process.env.NETLIFY === "true";
 
 const options = {
   definition: {
@@ -21,23 +20,20 @@ const options = {
       },
     },
     servers: [
-      isNetlify
-        ? {
-            url: "/.netlify/functions/api/v2",
-            description: "Netlify Production",
-          }
-        : {
-            url: `http://localhost:${config.port}/v2`,
-            description: "Local server",
-          },
+      {
+        url: `http://localhost:${config.port}/v2`,
+        description: "Local server",
+      },
       // {
       //   url: `https://api-sandbox.pharmahubmedica.ng/v2`,
       //   description: "Sandbox server",
       // },
     ],
   },
-  // apis: [path.resolve("src/docs/v2/*.doc.yml")],
-  apis: ["./src/docs/v2/*.doc.yml"],
+  apis: [
+    path.resolve("src/routes/**/*.ts"),
+    path.resolve("src/docs/v2/*.doc.yml"),
+  ],
 };
 
 export const createSwaggerSpec = () => swaggerJsdoc(options);
