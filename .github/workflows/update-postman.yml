@@ -14,8 +14,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Swagger JSON
-        run: node --trace-uncaught --trace-warnings --loader ts-node/esm scripts/export-swagger.ts
+      - name: Compile TypeScript
+        run: npx tsc
+
+      - name: Generate Swagger JSON
+        run: node dist/scripts/export-swagger.js
 
       - name: Update Postman collection
         env:

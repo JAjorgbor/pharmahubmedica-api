@@ -1,11 +1,8 @@
-import config from "../../config/config.js";
+import config from "@/config/config.js";
 import swaggerJsdoc from "swagger-jsdoc";
-import fs from "fs";
-import path from "path";
+import pkg from "../../../package.json" with { type: "json" };
 
-const pkg = JSON.parse(
-  String(fs.readFileSync(new URL("../../../package.json", import.meta.url))),
-);
+import path from "path";
 
 const { version } = pkg;
 
@@ -15,6 +12,7 @@ const options = {
     info: {
       title: "Pharmahubmedica API Documentation",
       version: version,
+      // description: 'Pharmahubmedica API Documentation',
       contact: {
         name: "Joshua Ajorgbor",
         url: "https://jajorgbor.vercel.app",
@@ -26,9 +24,16 @@ const options = {
         url: `http://localhost:${config.port}/v2`,
         description: "Local server",
       },
+      // {
+      //   url: `https://api-sandbox.pharmahubmedica.ng/v2`,
+      //   description: "Sandbox server",
+      // },
     ],
   },
-  apis: ["src/routes/**/*.ts", "src/docs/v2/*.doc.yml"],
+  apis: [
+    path.resolve("src/routes/**/*.ts"),
+    path.resolve("src/docs/v2/*.doc.yml"),
+  ],
 };
 
 export const createSwaggerSpec = () => swaggerJsdoc(options);
