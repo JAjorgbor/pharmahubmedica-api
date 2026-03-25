@@ -1,4 +1,3 @@
-import config from "../../config/config.js";
 import swaggerJsdoc from "swagger-jsdoc";
 import pkg from "../../../package.json" with { type: "json" };
 
@@ -21,7 +20,7 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${config.port}/v2`,
+        url: `http://localhost:${5000}/v2`,
         description: "Local server",
       },
       // {
