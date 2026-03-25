@@ -15,7 +15,7 @@ jobs:
         run: npm install
 
       - name: Build Swagger JSON
-        run: node scripts/build-swagger.js
+        run: node scripts/export-swagger.js
 
       - name: Update Postman collection
         env:
