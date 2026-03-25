@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { createSwaggerSpec } from "../dist/src/docs/v2/swagger-def.js";
+import { createSwaggerSpec } from "../src/docs/v2/swagger-def";
 
 // generate merged spec
 const swaggerSpec = createSwaggerSpec();
