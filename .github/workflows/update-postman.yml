@@ -15,7 +15,7 @@ jobs:
         run: npm install
 
       - name: Build Swagger JSON
-        run: node --loader ts-node/esm scripts/export-swagger.ts
+        run: node --trace-uncaught --trace-warnings --loader ts-node/esm scripts/export-swagger.ts
 
       - name: Update Postman collection
         env:
