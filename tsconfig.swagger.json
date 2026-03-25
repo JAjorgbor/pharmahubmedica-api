@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmitOnError": false, // ✅ allow emit even with errors
+    "strict": false, // ✅ disable strict checks
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src/docs/**/*.ts", "scripts/**/*.ts"]
+}

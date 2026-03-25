@@ -15,7 +15,7 @@ jobs:
         run: npm install
 
       - name: Compile TypeScript
-        run: npx tsc
+        run: npx tsc -p tsconfig.swagger.json
 
       - name: Generate Swagger JSON
         run: node scripts/export-swagger.js

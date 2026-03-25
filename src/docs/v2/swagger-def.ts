@@ -1,4 +1,4 @@
-import config from "@/config/config.js";
+import config from "../../config/config.js";
 import swaggerJsdoc from "swagger-jsdoc";
 import pkg from "../../../package.json" with { type: "json" };
 
