@@ -1,8 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import pkg from "../../../package.json" with { type: "json" };
 
-import path from "path";
-
 const { version } = pkg;
 
 const options = {
@@ -29,10 +27,7 @@ const options = {
       // },
     ],
   },
-  apis: [
-    path.resolve("src/routes/**/*.ts"),
-    path.resolve("src/docs/v2/*.doc.yml"),
-  ],
+  apis: ["./src/routes/**/*.ts", "./src/docs/v2/*.doc.yml"],
 };
 
 export const createSwaggerSpec = () => swaggerJsdoc(options);
