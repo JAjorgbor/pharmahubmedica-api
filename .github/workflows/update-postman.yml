@@ -18,7 +18,7 @@ jobs:
         run: npx tsc
 
       - name: Generate Swagger JSON
-        run: node dist/scripts/export-swagger.js
+        run: node scripts/export-swagger.js
 
       - name: Update Postman collection
         env:
