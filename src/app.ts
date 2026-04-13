@@ -32,13 +32,19 @@ const explicitAllowedOrigins = new Set<string>([
   `http://localhost:${config.port}`,
 ]);
 
-/** Allow root + any subdomain that ends with .pharmahubmedica.ng */
+/** Root domains allowed (including subdomains) */
+const allowedRootDomains = [
+  "pharmahubmedica.ng",
+  "pharmahubnaija.com",
+  "pharmahubnigeria.com",
+];
+
+/** Allow root + any subdomain that ends with one of the allowed root domains */
 function isAllowedOrigin(origin: string) {
   try {
     const { hostname } = new URL(origin);
-    return (
-      hostname === "pharmahubmedica.ng" ||
-      hostname.endsWith(".pharmahubmedica.ng")
+    return allowedRootDomains.some(
+      (root) => hostname === root || hostname.endsWith(`.${root}`),
     );
   } catch {
     return false;

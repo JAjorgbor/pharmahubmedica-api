@@ -115,8 +115,49 @@ const defaultRoutes = [
 
 defaultRoutes.forEach((route) => router.use(route.path, route.route));
 
-router.use("/docs", swaggerUi.serve, (req: any, res: any, next: any) =>
-  swaggerUi.setup(createSwaggerSpec())(req, res, next),
-);
+// router.use("/docs", swaggerUi.serve, (req: any, res: any, next: any) =>
+//   swaggerUi.setup(createSwaggerSpec())(req, res, next),
+// );
+
+const isNetlify = process.env.NETLIFY === "true";
+
+// Always expose the raw Swagger spec
+router.get("/swagger.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(createSwaggerSpec());
+});
+
+if (!isNetlify) {
+  // Local development → swagger-ui-express
+  router.use("/docs", swaggerUi.serve);
+
+  router.get("/docs", (req, res, next) => {
+    return swaggerUi.setup(createSwaggerSpec())(req, res, next);
+  });
+} else {
+  // Netlify production → CDN Swagger UI
+  router.get("/docs", (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>API Docs</title>
+          <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+        </head>
+        <body>
+          <div id="swagger-ui"></div>
+
+          <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+          <script>
+            SwaggerUIBundle({
+              url: '/.netlify/functions/api/v2/swagger.json',
+              dom_id: '#swagger-ui'
+            });
+          </script>
+        </body>
+      </html>
+    `);
+  });
+}
 
 export default router;
